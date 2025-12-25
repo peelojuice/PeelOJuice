@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Minus, Plus } from 'lucide-react';
-import api from '../services/api';
+import api, { BASE_URL } from '../services/api';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
 import BenefitsPanel from '../components/BenefitsPanel';
@@ -71,7 +71,7 @@ export default function JuiceDetail() {
   
   // Construct full image URL
   const imageUrl = juice.image ? 
-    (juice.image.startsWith('http') ? juice.image : `http://localhost:8000${juice.image}`) 
+    (juice.image.startsWith('http') ? juice.image : `${BASE_URL}${juice.image}`) 
     : null;
 
   return (

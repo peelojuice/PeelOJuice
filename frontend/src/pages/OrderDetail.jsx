@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
+import {
   ArrowLeft, Package, Clock, CheckCircle, XCircle, Truck, ChefHat,
   MapPin, Phone, Mail, CreditCard, Banknote, AlertTriangle
 } from 'lucide-react';
-import api from '../services/api';
+import api, { BASE_URL } from '../services/api';
 import { useToast } from '../context/ToastContext';
 
 export default function OrderDetail() {
@@ -163,7 +163,7 @@ export default function OrderDetail() {
             {(order.items || []).map((item) => (
               <div key={item.id} className="flex gap-4 p-4 bg-gray-50 rounded-xl">
                 <img
-                  src={item.juice_image ? `http://localhost:8000${item.juice_image}` : '/placeholder-juice.jpg'}
+                  src={item.juice_image ? (item.juice_image.startsWith('http') ? item.juice_image : `${BASE_URL}${item.juice_image}`) : '/placeholder-juice.jpg'}
                   alt={item.juice_name}
                   className="w-20 h-20 object-cover rounded-lg"
                   onError={(e) => { e.target.src = '/placeholder-juice.jpg'; }}

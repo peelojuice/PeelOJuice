@@ -1,11 +1,12 @@
 import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { BASE_URL } from '../services/api';
 
 export default function JuiceCard({ juice, onAddToCart }) {
   const navigate = useNavigate();
 
   const imageUrl = juice.image 
-    ? `http://localhost:8000${juice.image}`
+    ? (juice.image.startsWith('http') ? juice.image : `${BASE_URL}${juice.image}`)
     : '/placeholder-juice.jpg';
 
   return (

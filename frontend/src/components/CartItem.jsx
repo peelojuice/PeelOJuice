@@ -1,8 +1,9 @@
 import { Minus, Plus, Trash2 } from 'lucide-react';
+import { BASE_URL } from '../services/api';
 
 export default function CartItem({ item, onUpdateQuantity, onRemove }) {
   const imageUrl = item.juice_image 
-    ? `http://localhost:8000${item.juice_image}` 
+    ? (item.juice_image.startsWith('http') ? item.juice_image : `${BASE_URL}${item.juice_image}`)
     : '/placeholder-juice.jpg';
 
   return (
