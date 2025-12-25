@@ -1,26 +1,26 @@
 import { useState, useEffect } from 'react';
 import { MapPin, ChevronDown } from 'lucide-react';
-import { useBranch } from '../context/BranchContext';
-import axios from 'axios';
+import api from '../services/api';
 
-export default function BranchSelector() {
-  const { selectedBranch, selectBranch, branches, setBranches } = useBranch();
+export default function BranchSelector({ onBranchSelect, selectedBranch }) {
+  const [branches, setBranches] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadBranches();
+    fetchBranches();
   }, []);
 
-  const loadBranches = async () => {
+  const fetchBranches = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://127.0.0.1:8000/api/products/branches/');
-      setBranches(response.data);
+      const response = await api.get('/products/branches/');
+      const fetchedBranches = response.data.results || response.data;
+      setBranches(fetchedBranches);
       
-      // Auto-select first branch if none selected
-      if (!selectedBranch && response.data.length > 0) {
-        selectBranch(response.data[0]);
+      // Auto-select first branch
+      if (fetchedBranches.length > 0 && onBranchSelect) {
+        onBranchSelect(fetchedBranches[0]);
       }
     } catch (error) {
       console.error('Error loading branches:', error);

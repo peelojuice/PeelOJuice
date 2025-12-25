@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../services/api';
+import api, { BASE_URL } from '../services/api';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
 import { useBranch } from '../context/BranchContext';
@@ -178,7 +178,7 @@ export default function Menu() {
                 {/* Product Image - Static, no zoom */}
                 <div className="aspect-[4/3] bg-gray-100 overflow-hidden">
                   <img
-                    src={juice.image ? `http://127.0.0.1:8000${juice.image}` : '/carrot-juice.png'}
+                    src={juice.image ? (juice.image.startsWith('http') ? juice.image : `${BASE_URL}${juice.image}`) : '/carrot-juice.png'}
                     alt={juice.name}
                     className="w-full h-full object-cover"
                     onError={(e) => {

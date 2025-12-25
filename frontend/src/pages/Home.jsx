@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, User, ShoppingCart, Leaf } from 'lucide-react';
-import axios from 'axios';
+import api, { BASE_URL } from '../services/api';
 import { useBranch } from '../context/BranchContext';
 
 export default function Home() {
@@ -22,7 +22,7 @@ export default function Home() {
     
     setLoading(true);
     try {
-      const response = await axios.get(`http://127.0.0.1:8000/api/products/branches/${selectedBranch.id}/products/`);
+      const response = await api.get(`/products/branches/${selectedBranch.id}/products/`);
       // Handle paginated response
       const productsData = response.data.results || [];
       setProducts(productsData.slice(0, 12));
@@ -101,7 +101,7 @@ export default function Home() {
                 {/* Product Image - Same as Menu */}
                 <div className="aspect-[4/3] bg-gray-100 overflow-hidden">
                   <img
-                    src={product.image ? `http://127.0.0.1:8000${product.image}` : '/carrot-juice.png'}
+                    src={product.image ? (product.image.startsWith('http') ? product.image : `${BASE_URL}${product.image}`) : '/carrot-juice.png'}
                     alt={product.name}
                     className="w-full h-full object-cover"
                     onError={(e) => {
