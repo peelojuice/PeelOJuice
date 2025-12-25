@@ -1,0 +1,213 @@
+{% extends 'staff/base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: transform 0.2s;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .stat-icon.green { background: #8BA888; }
+    .stat-icon.blue { background: #3B82F6; }
+    .stat-icon.orange { background: #F97316; }
+    .stat-icon.purple { background: #A855F7; }
+
+    .stat-content h3 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-content p {
+        color: #6B7280;
+        font-size: 0.875rem;
+    }
+
+    .orders-table {
+        background: white;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .table-header {
+        padding: 1.5rem;
+        border-bottom: 2px solid #E5E7EB;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .table-header h2 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #111827;
+    }
+
+    .table-header a {
+        color: #8BA888;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    thead {
+        background: #F9FAFB;
+    }
+
+    th {
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        color: #374151;
+        font-size: 0.875rem;
+    }
+
+    td {
+        padding: 1rem;
+        border-top: 1px solid #E5E7EB;
+        color: #1F2937;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .status-pending { background: #FEF3C7; color: #92400E; }
+    .status-confirmed { background: #DBEAFE; color: #1E40AF; }
+    .status-preparing { background: #E0E7FF; color: #3730A3; }
+    .status-out_for_delivery { background: #FBCFE8; color: #BE185D; }
+    .status-delivered { background: #D1FAE5; color: #065F46; }
+    .status-cancelled { background: #FEE2E2; color: #991B1B; }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: #9CA3AF;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1 style="font-size: 1.875rem; font-weight: 700; margin-bottom: 1.5rem;">Dashboard Overview</h1>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon green">
+            <i data-lucide="shopping-bag" style="width: 28px; height: 28px; color: white;"></i>
+        </div>
+        <div class="stat-content">
+            <h3>{{ stats.total_orders }}</h3>
+            <p>Total Orders</p>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon blue">
+            <i data-lucide="calendar" style="width: 28px; height: 28px; color: white;"></i>
+        </div>
+        <div class="stat-content">
+            <h3>{{ stats.today_orders }}</h3>
+            <p>Today's Orders</p>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon orange">
+            <i data-lucide="clock" style="width: 28px; height: 28px; color: white;"></i>
+        </div>
+        <div class="stat-content">
+            <h3>{{ stats.pending_orders }}</h3>
+            <p>Pending Orders</p>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon purple">
+            <i data-lucide="truck" style="width: 28px; height: 28px; color: white;"></i>
+        </div>
+        <div class="stat-content">
+            <h3>{{ stats.out_for_delivery }}</h3>
+            <p>Out for Delivery</p>
+        </div>
+    </div>
+</div>
+
+<div class="orders-table">
+    <div class="table-header">
+        <h2>Recent Orders</h2>
+        <a href="{% url 'staff_orders_list' %}">View All →</a>
+    </div>
+
+    {% if recent_orders %}
+    <table>
+        <thead>
+            <tr>
+                <th>Order #</th>
+                <th>Customer</th>
+                <th>Items</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in recent_orders %}
+            <tr>
+                <td><strong>#{{ order.order_number }}</strong></td>
+                <td>{{ order.user.full_name|default:order.user.email }}</td>
+                <td>{{ order.items.count }} item{{ order.items.count|pluralize }}</td>
+                <td>₹{{ order.total_amount }}</td>
+                <td><span class="status-badge status-{{ order.status }}">{{ order.get_status_display }}</span></td>
+                <td>{{ order.created_at|date:"M d, H:i" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+        <i data-lucide="inbox" style="width: 64px; height: 64px; margin: 0 auto 1rem;"></i>
+        <p>No orders yet for {{ branch.name }}</p>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

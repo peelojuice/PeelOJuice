@@ -1,0 +1,301 @@
+{% extends 'staff/base.html' %}
+
+{% block title %}Orders{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        font-size: 1.875rem;
+        font-weight: 700;
+    }
+
+    .tabs {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        background: white;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .tab {
+        flex: 1;
+        padding: 0.875rem 1.5rem;
+        background: #F3F4F6;
+        color: #374151;
+        text-decoration: none;
+        border-radius: 0.375rem;
+        font-weight: 600;
+        text-align: center;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .tab:hover {
+        background: #E5E7EB;
+    }
+
+    .tab.active {
+        background: #8BA888;
+        color: white;
+    }
+
+    .count-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 24px;
+        height: 24px;
+        padding: 0 0.5rem;
+        background: #EF4444;
+        color: white;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        animation: pulse 2s infinite;
+    }
+
+    .tab.active .count-badge {
+        background: #FFFFFF;
+        color: #8BA888;
+    }
+
+    .count-badge.completed {
+        background: #10B981;
+    }
+
+    .tab.active .count-badge.completed {
+        background: #FFFFFF;
+        color: #10B981;
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.1);
+        }
+    }
+
+    .filters {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .filter-group {
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .filter-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #374151;
+        font-size: 0.875rem;
+    }
+
+    .filter-group input,
+    .filter-group select {
+        width: 100%;
+        padding: 0.625rem;
+        border: 1px solid #D1D5DB;
+        border-radius: 0.375rem;
+        font-size: 0.875rem;
+    }
+
+    .filter-btn {
+        align-self: end;
+        padding: 0.625rem 1.5rem;
+        background: #8BA888;
+        color: white;
+        border: none;
+        border-radius: 0.375rem;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .filter-btn:hover {
+        background: #7a9677;
+    }
+
+    .orders-table {
+        background: white;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    thead {
+        background: #111827;
+        color: #FFFFFF;
+    }
+
+    th {
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+
+    td {
+        padding: 1rem;
+        border-top: 1px solid #E5E7EB;
+        color: #1F2937;
+    }
+
+    tbody tr:hover {
+        background: #F9FAFB;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 0.375rem 0.875rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .status-pending { background: #FEF3C7; color: #92400E; }
+    .status-confirmed { background: #DBEAFE; color: #1E40AF; }
+    .status-preparing { background: #E0E7FF; color: #3730A3; }
+    .status-out_for_delivery { background: #FBCFE8; color: #BE185D; }
+    .status-delivered { background: #D1FAE5; color: #065F46; }
+    .status-cancelled { background: #FEE2E2; color: #991B1B; }
+
+    .view-btn {
+        padding: 0.5rem 1rem;
+        background: #8BA888;
+        color: white;
+        text-decoration: none;
+        border-radius: 0.375rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+
+    .view-btn:hover {
+        background: #7a9677;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #9CA3AF;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Orders for {{ branch.name }}</h1>
+</div>
+
+<!-- Tabs with Count Badges -->
+<div class="tabs">
+    <a href="?tab=active" class="tab {% if tab == 'active' %}active{% endif %}">
+        Active Orders
+        {% if active_count > 0 %}
+        <span class="count-badge">{{ active_count }}</span>
+        {% endif %}
+    </a>
+    <a href="?tab=completed" class="tab {% if tab == 'completed' %}active{% endif %}">
+        Completed Orders
+        {% if completed_count > 0 %}
+        <span class="count-badge completed">{{ completed_count }}</span>
+        {% endif %}
+    </a>
+</div>
+
+<form method="GET" class="filters">
+    <input type="hidden" name="tab" value="{{ tab }}">
+    <div class="filter-group">
+        <label>Search</label>
+        <input type="text" name="search" placeholder="Order #, customer name, email..." value="{{ search_query }}">
+    </div>
+
+    <div class="filter-group">
+        <label>Status</label>
+        <select name="status">
+            <option value="">All Statuses</option>
+            {% for choice in status_choices %}
+            <option value="{{ choice.0 }}" {% if status_filter == choice.0 %}selected{% endif %}>
+                {{ choice.1 }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <button type="submit" class="filter-btn">Filter</button>
+</form>
+
+<div class="orders-table">
+    {% if orders %}
+    <table>
+        <thead>
+            <tr>
+                <th>Order #</th>
+                <th>Customer</th>
+                <th>Contact</th>
+                <th>Items</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td><strong>#{{ order.order_number }}</strong></td>
+                <td>{{ order.user.full_name|default:order.user.email }}</td>
+                <td>{{ order.user.phone_number }}</td>
+                <td>{{ order.items.count }} item{{ order.items.count|pluralize }}</td>
+                <td>₹{{ order.total_amount }}</td>
+                <td><span class="status-badge status-{{ order.status }}">{{ order.get_status_display }}</span></td>
+                <td>{{ order.created_at|date:"M d, Y H:i" }}</td>
+                <td>
+                    <a href="{% url 'staff_order_detail' order.id %}" class="view-btn">View Details</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+        <i data-lucide="inbox" style="width: 64px; height: 64px; margin: 0 auto 1rem; color: #D1D5DB;"></i>
+        <p style="font-size: 1.125rem; margin-bottom: 0.5rem;">No orders found</p>
+        <p style="font-size: 0.875rem;">Try adjusting your filters</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+// Auto-refresh every 30 seconds to check for new orders
+setTimeout(function() {
+    location.reload();
+}, 30000);
+</script>
+{% endblock %}

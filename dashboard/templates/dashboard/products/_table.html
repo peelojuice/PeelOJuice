@@ -1,0 +1,146 @@
+<!-- Products Table -->
+<table class="products-table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Status</th>
+            <th>Branch Availability</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for product in page_obj %}
+        <tr>
+            <td>{{ product.id }}</td>
+            <td>{{ product.name }}</td>
+            <td>{{ product.category.name }}</td>
+            <td>₹{{ product.price }}</td>
+            <td>
+                {% if product.is_active %}
+                <span class="status-badge status-active">
+                    <i data-lucide="check-circle"></i>
+                    Active
+                </span>
+                {% else %}
+                <span class="status-badge status-inactive">
+                    <i data-lucide="circle"></i>
+                    Inactive
+                </span>
+                {% endif %}
+            </td>
+            <td>
+                {% if selected_branch %}
+                <span 
+                    class="availability-toggle {% if product.branch_available %}available{% else %}unavailable{% endif %}"
+                    data-product-id="{{ product.id }}"
+                    data-branch-id="{{ selected_branch.id }}"
+                >
+                    <i data-lucide="{% if product.branch_available %}check-circle{% else %}x-circle{% endif %}"></i>
+                    <span class="status-text">{% if product.branch_available %}Available{% else %}Unavailable{% endif %}</span>
+                </span>
+                {% else %}
+                <span class="text-muted">-</span>
+                {% endif %}
+            </td>
+            <td>
+                <div class="action-buttons">
+                    <a href="{% url 'dashboard_product_edit' product.id %}" class="action-btn btn-edit">
+                        <i data-lucide="edit-2"></i>
+                        Edit
+                    </a>
+                    <a href="{% url 'dashboard_product_toggle' product.id %}" class="action-btn btn-toggle">
+                        <i data-lucide="power"></i>
+                        {% if product.is_active %}Deactivate{% else %}Activate{% endif %}
+                    </a>
+                    <form method="post" action="{% url 'dashboard_product_delete' product.id %}" style="display: inline;" onsubmit="return confirm('Delete this product?');">
+                        {% csrf_token %}
+                        <button type="submit" class="action-btn btn-delete">
+                            <i data-lucide="trash-2"></i>
+                            Delete
+                        </button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="7">
+                <div class="empty-state">
+                    <i data-lucide="package-x"></i>
+                    <p style="font-size: 16px; margin: 10px 0;">No products found</p>
+                    <p style="font-size: 14px;">Try adjusting your filters or add a new product</p>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function toggleBranchAvailability(productId, branchId, element) {
+    const csrftoken = getCookie('csrftoken');
+    
+    fetch('/dashboard/products/' + productId + '/branch/' + branchId + '/toggle/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrftoken,
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Toggle classes
+            if (data.is_available) {
+                element.classList.remove('unavailable');
+                element.classList.add('available');
+                element.querySelector('.status-text').textContent = 'Available';
+                element.querySelector('[data-lucide]').setAttribute('data-lucide', 'check-circle');
+            } else {
+                element.classList.remove('available');
+                element.classList.add('unavailable');
+                element.querySelector('.status-text').textContent = 'Unavailable';
+                element.querySelector('[data-lucide]').setAttribute('data-lucide', 'x-circle');
+            }
+            // Re-initialize icons
+            lucide.createIcons();
+        } else {
+            alert('Error toggling availability: ' + (data.error || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to toggle availability');
+    });
+}
+
+// Event delegation for availability toggles
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelector('.products-table').addEventListener('click', function(e) {
+        const toggle = e.target.closest('.availability-toggle');
+        if (toggle) {
+            const productId = toggle.dataset.productId;
+            const branchId = toggle.dataset.branchId;
+            toggleBranchAvailability(productId, branchId, toggle);
+        }
+    });
+});
+</script>

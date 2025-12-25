@@ -1,0 +1,596 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}{% if product %}Edit Product{% else %}Add New Product{% endif %}{% endblock %}
+{% block page_title %}{% if product %}Edit Product{% else %}Add New Product{% endif %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .form-card {
+        background: #FFFFFF;
+        border-radius: 0.75rem;
+        padding: 35px;
+        border: 1px solid #E5E7EB;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .form-section {
+        margin-bottom: 35px;
+    }
+
+    .section-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #E5E7EB;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .section-title svg {
+        width: 20px;
+        height: 20px;
+        color: #8BA888;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 8px;
+    }
+
+    .required {
+        color: #EF4444;
+        margin-left: 2px;
+    }
+
+    .form-hint {
+        font-size: 12px;
+        color: #6B7280;
+        margin-top: 4px;
+        font-style: italic;
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid #D1D5DB;
+        border-radius: 0.5rem;
+        font-size: 14px;
+        transition: all 0.2s;
+        font-family: inherit;
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+        outline: none;
+        border-color: #000000;
+        box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+    }
+
+    .form-textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .form-textarea.large {
+        min-height: 150px;
+    }
+
+    /* Image Upload */
+    .image-upload-wrapper {
+        display: block;
+        border: 2px dashed #D1D5DB;
+        border-radius: 0.5rem;
+        padding: 25px;
+        text-align: center;
+        background: #F9FAFB;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+
+    .image-upload-wrapper:hover {
+        border-color: #8BA888;
+        background: #FFFFFF;
+    }
+
+    .image-upload-wrapper svg {
+        width: 48px;
+        height: 48px;
+        color: #9CA3AF;
+        margin-bottom: 15px;
+        pointer-events: none;
+    }
+
+    .image-upload-label {
+        display: block;
+        color: #374151;
+        font-weight: 500;
+        pointer-events: none;
+    }
+
+    .image-upload-input {
+        display: none;
+    }
+
+    .current-image {
+        margin-top: 15px;
+        max-width: 200px;
+        border-radius: 0.5rem;
+        border: 1px solid #E5E7EB;
+        pointer-events: none;
+    }
+
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 15px;
+        background: #F9FAFB;
+        border-radius: 0.5rem;
+        border: 1px solid #E5E7EB;
+    }
+
+    .checkbox-input {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+
+    .checkbox-label {
+        font-size: 14px;
+        font-weight: 500;
+        color: #374151;
+        cursor: pointer;
+    }
+
+    /* Nutrition Grid */
+    .nutrition-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+    }
+
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 15px;
+        background: #F9FAFB;
+        border-radius: 0.5rem;
+        border: 1px solid #E5E7EB;
+    }
+
+    .checkbox-input {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+
+    .checkbox-label {
+        font-size: 14px;
+        font-weight: 500;
+        color: #374151;
+        cursor: pointer;
+    }
+
+    /* Nutrition Grid */
+    .nutrition-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+    }
+
+    /* Action Buttons */
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: flex-end;
+        margin-top: 35px;
+        padding-top: 25px;
+        border-top: 2px solid #E5E7EB;
+    }
+
+    .btn {
+        padding: 12px 28px;
+        border-radius: 0.5rem;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        border: none;
+    }
+
+    .btn svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .btn-primary {
+        background: #000000;
+        color: #FFFFFF;
+    }
+
+    .btn-primary:hover {
+        background: #1F2937;
+        transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+        background: #FFFFFF;
+        color: #374151;
+        border: 2px solid #D1D5DB;
+    }
+
+    .btn-secondary:hover {
+        background: #F3F4F6;
+        border-color: #9CA3AF;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .form-grid,
+        .nutrition-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .form-card {
+            padding: 20px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <form method="POST" enctype="multipart/form-data" class="form-card">
+        {% csrf_token %}
+
+        <!-- Basic Information -->
+        <div class="form-section">
+            <h3 class="section-title">
+                <i data-lucide="info"></i>
+                Basic Information
+            </h3>
+            
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label class="form-label">
+                        Product Name<span class="required">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        name="name" 
+                        class="form-input" 
+                        placeholder="Enter product name (e.g., Mango Juice)"
+                        value="{{ product.name|default:'' }}"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        Category<span class="required">*</span>
+                    </label>
+                    <select name="category" class="form-select" required>
+                        <option value="">Select a category</option>
+                        {% for category in categories %}
+                        <option value="{{ category.id }}" {% if product and product.category.id == category.id %}selected{% endif %}>
+                            {{ category.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        Price (₹)<span class="required">*</span>
+                    </label>
+                    <input 
+                        type="number" 
+                        name="price" 
+                        class="form-input" 
+                        placeholder="0.00"
+                        step="0.01"
+                        min="0"
+                        value="{{ product.price|default:'' }}"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        Net Quantity (ml)
+                    </label>
+                    <input 
+                        type="number" 
+                        name="net_quantity_ml" 
+                        class="form-input" 
+                        placeholder="300"
+                        min="0"
+                        value="{{ product.net_quantity_ml|default:'300' }}"
+                    >
+                    <p class="form-hint">Default: 300ml</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        Allergen Information
+                    </label>
+                    <input 
+                        type="text" 
+                        name="allergen_info" 
+                        class="form-input" 
+                        placeholder="e.g., May contain traces of nuts"
+                        value="{{ product.allergen_info|default:'' }}"
+                    >
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Image -->
+        <div class="form-section">
+            <h3 class="section-title">
+                <i data-lucide="image"></i>
+                Product Image
+            </h3>
+
+            <label for="image-upload" class="image-upload-wrapper">
+                <i data-lucide="upload-cloud"></i>
+                <span class="image-upload-label">
+                    Click anywhere to upload product image
+                </span>
+                <input 
+                    type="file" 
+                    id="image-upload" 
+                    name="image" 
+                    class="image-upload-input"
+                    accept="image/*"
+                >
+                <p class="form-hint">Recommended: 800x800px, JPG or PNG</p>
+                
+                {% if product and product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="current-image">
+                <p class="form-hint">Current image (upload new to replace)</p>
+                {% endif %}
+            </label>
+        </div>
+
+        <!-- Description -->
+        <div class="form-section">
+            <h3 class="section-title">
+                <i data-lucide="file-text"></i>
+                Description
+            </h3>
+
+            <div class="form-group">
+                <label class="form-label">
+                    Short Description<span class="required">*</span>
+                </label>
+                <textarea 
+                    name="description" 
+                    class="form-textarea"
+                    placeholder="Brief description shown in product listings..."
+                    required
+                >{{ product.description|default:'' }}</textarea>
+                <p class="form-hint">Brief description shown in product listings</p>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    Long Description
+                </label>
+                <textarea 
+                    name="long_description" 
+                    class="form-textarea large"
+                    placeholder="Detailed description shown on product page..."
+                >{{ product.long_description|default:'' }}</textarea>
+                <p class="form-hint">Detailed description shown on product page</p>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    Ingredients<span class="required">*</span>
+                </label>
+                <textarea 
+                    name="ingredients" 
+                    class="form-textarea"
+                    placeholder="List all ingredients (e.g., Mango pulp, Water, Sugar, Citric acid)"
+                    required
+                >{{ product.ingredients|default:'' }}</textarea>
+                <p class="form-hint">Comma-separated list of ingredients</p>
+            </div>
+        </div>
+
+        <!-- Features & Benefits -->
+        <div class="form-section">
+            <h3 class="section-title">
+                <i data-lucide="star"></i>
+                Features & Benefits
+            </h3>
+
+            <div class="form-group">
+                <label class="form-label">
+                    Key Features
+                </label>
+                <textarea 
+                    name="features" 
+                    class="form-textarea"
+                    placeholder="Enter key features, one per line:
+&#10;- 100% Natural
+&#10;- No Added Sugar
+&#10;- Fresh Ingredients"
+                >{{ product.features|join:'&#10;'|default:'' }}</textarea>
+                <p class="form-hint">One feature per line (e.g., "100% Natural")</p>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    Health Benefits
+                </label>
+                <textarea 
+                    name="benefits" 
+                    class="form-textarea"
+                    placeholder="Enter health benefits, one per line:
+&#10;- Rich in Vitamin C
+&#10;- Boosts Immunity
+&#10;- Aids Digestion"
+                >{% if product.benefits %}{% for benefit in product.benefits %}{{ benefit.title }}{% if not forloop.last %}&#10;{% endif %}{% endfor %}{% endif %}</textarea>
+                <p class="form-hint">One benefit per line (e.g., "Rich in Vitamin C")</p>
+            </div>
+        </div>
+
+        <!-- Nutritional Information -->
+        <div class="form-section">
+            <h3 class="section-title">
+                <i data-lucide="activity"></i>
+                Nutritional Information (per 100ml)
+            </h3>
+
+            <div class="nutrition-grid">
+                <div class="form-group">
+                    <label class="form-label">Calories (kcal)</label>
+                    <input 
+                        type="number" 
+                        name="nutrition_calories" 
+                        class="form-input" 
+                        step="0.1"
+                        min="0"
+                        value="{{ product.nutrition_calories|default:'150' }}"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Total Fat (g)</label>
+                    <input 
+                        type="number" 
+                        name="nutrition_total_fat" 
+                        class="form-input" 
+                        step="0.1"
+                        min="0"
+                        value="{{ product.nutrition_total_fat|default:'2.0' }}"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Carbohydrate (g)</label>
+                    <input 
+                        type="number" 
+                        name="nutrition_carbohydrate" 
+                        class="form-input" 
+                        step="0.1"
+                        min="0"
+                        value="{{ product.nutrition_carbohydrate|default:'30.0' }}"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Dietary Fiber (g)</label>
+                    <input 
+                        type="number" 
+                        name="nutrition_dietary_fiber" 
+                        class="form-input" 
+                        step="0.1"
+                        min="0"
+                        value="{{ product.nutrition_dietary_fiber|default:'2.0' }}"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Total Sugars (g)</label>
+                    <input 
+                        type="number" 
+                        name="nutrition_total_sugars" 
+                        class="form-input" 
+                        step="0.1"
+                        min="0"
+                        value="{{ product.nutrition_total_sugars|default:'20.0' }}"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Protein (g)</label>
+                    <input 
+                        type="number" 
+                        name="nutrition_protein" 
+                        class="form-input" 
+                        step="0.1"
+                        min="0"
+                        value="{{ product.nutrition_protein|default:'3.0' }}"
+                    >
+                </div>
+            </div>
+        </div>
+
+        <!-- Status -->
+        <div class="form-section">
+            <h3 class="section-title">
+                <i data-lucide="toggle-right"></i>
+                Product Status
+            </h3>
+
+            <div class="checkbox-group">
+                <input 
+                    type="checkbox" 
+                    id="is_active" 
+                    name="is_active" 
+                    class="checkbox-input"
+                    {% if not product or product.is_active %}checked{% endif %}
+                >
+                <label for="is_active" class="checkbox-label">
+                    Product is active and visible to customers
+                </label>
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+            <a href="{% url 'dashboard_products' %}" class="btn btn-secondary">
+                <i data-lucide="x"></i>
+                Cancel
+            </a>
+            <button type="submit" class="btn btn-primary">
+                <i data-lucide="save"></i>
+                {% if product %}Update Product{% else %}Create Product{% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+</script>
+{% endblock %}

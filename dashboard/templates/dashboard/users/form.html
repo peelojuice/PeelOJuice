@@ -1,0 +1,393 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}{% if user_obj %}Edit User{% else %}Add New User{% endif %}{% endblock %}
+{% block page_title %}{% if user_obj %}Edit User{% else %}Add New User{% endif %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .form-card {
+        background: #FFFFFF;
+        border-radius: 0.75rem;
+        padding: 35px;
+        border: 1px solid #E5E7EB;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .form-section {
+        margin-bottom: 30px;
+    }
+
+    .section-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #E5E7EB;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .section-title svg {
+        width: 20px;
+        height: 20px;
+        color: #8BA888;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 8px;
+    }
+
+    .required {
+        color: #EF4444;
+        margin-left: 2px;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid #D1D5DB;
+        border-radius: 0.5rem;
+        font-size: 14px;
+        transition: all 0.2s;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #000000;
+        box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+    }
+
+    .form-hint {
+        font-size: 12px;
+        color: #6B7280;
+        margin-top: 4px;
+    }
+
+    .checkbox-group {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 15px;
+        background: #F9FAFB;
+        border-radius: 0.5rem;
+        border: 1px solid #E5E7EB;
+    }
+
+    .checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .checkbox-input {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+
+    .checkbox-label {
+        font-size: 14px;
+        font-weight: 500;
+        color: #374151;
+        cursor: pointer;
+        flex: 1;
+    }
+
+    .checkbox-description {
+        font-size: 12px;
+        color: #6B7280;
+        margin-left: 30px;
+        margin-top: -8px;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #E5E7EB;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+    }
+
+    .btn svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .btn-primary {
+        background: #000000;
+        color: #FFFFFF;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background: #1F2937;
+    }
+
+    .btn-secondary {
+        background: #F3F4F6;
+        color: #374151;
+        border: 1px solid #D1D5DB;
+    }
+
+    .btn-secondary:hover {
+        background: #E5E7EB;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <form method="POST" class="form-card">
+        {% csrf_token %}
+
+        <!-- Basic Information -->
+        <div class="form-section">
+            <h3 class="section-title">
+                <i data-lucide="user"></i>
+                Basic Information
+            </h3>
+
+            <div class="form-group">
+                <label class="form-label">
+                    Email<span class="required">*</span>
+                </label>
+                <input 
+                    type="email" 
+                    name="email" 
+                    class="form-input" 
+                    placeholder="user@example.com"
+                    value="{{ user_obj.email|default:'' }}"
+                    required
+                    {% if user_obj %}readonly{% endif %}
+                >
+                {% if user_obj %}
+                <p class="form-hint">Email cannot be changed</p>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    Full Name
+                </label>
+                <input 
+                    type="text" 
+                    name="full_name" 
+                    class="form-input" 
+                    placeholder="John Doe"
+                    value="{{ user_obj.full_name|default:'' }}"
+                >
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    Phone Number
+                </label>
+                <input 
+                    type="tel" 
+                    name="phone_number" 
+                    class="form-input" 
+                    placeholder="+91 1234567890"
+                    value="{{ user_obj.phone_number|default:'' }}"
+                >
+            </div>
+
+            {% if not user_obj %}
+            <div class="form-group">
+                <label class="form-label">
+                    Password<span class="required">*</span>
+                </label>
+                <input 
+                    type="password" 
+                    name="password" 
+                    class="form-input" 
+                    placeholder="Enter password"
+                    required
+                >
+                <p class="form-hint">Minimum 8 characters</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Permissions -->
+        <div class="form-section">
+            <h3 class="section-title">
+                <i data-lucide="shield"></i>
+                Access Level & Permissions
+            </h3>
+
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <input 
+                        type="checkbox" 
+                        id="is_active" 
+                        name="is_active" 
+                        class="checkbox-input"
+                        {% if not user_obj or user_obj.is_active %}checked{% endif %}
+                    >
+                    <label for="is_active" class="checkbox-label">
+                        <strong>Active</strong>
+                    </label>
+                </div>
+                <div class="checkbox-description">User can log in and access the application</div>
+
+                <div class="checkbox-item">
+                    <input 
+                        type="checkbox" 
+                        id="is_staff" 
+                        name="is_staff" 
+                        class="checkbox-input"
+                        {% if user_obj and user_obj.is_staff %}checked{% endif %}
+                    >
+                    <label for="is_staff" class="checkbox-label">
+                        <strong>Staff</strong>
+                    </label>
+                </div>
+                <div class="checkbox-description">Has access to admin dashboard (limited permissions)</div>
+
+                <div class="checkbox-item">
+                    <input 
+                        type="checkbox" 
+                        id="is_superuser" 
+                        name="is_superuser" 
+                        class="checkbox-input"
+                        {% if user_obj and user_obj.is_superuser %}checked{% endif %}
+                    >
+                    <label for="is_superuser" class="checkbox-label">
+                        <strong>Superuser</strong>
+                    </label>
+                </div>
+                <div class="checkbox-description">Full admin access - can manage everything</div>
+            </div>
+        </div>
+
+        <!-- Branch Assignment (for Staff) -->
+        <div class="form-section" id="branchSection" style="display: none;">
+            <h3 class="section-title">
+                <i data-lucide="map-pin"></i>
+                Branch Assignment
+            </h3>
+
+            <div class="form-group">
+                <label class="form-label">
+                    Assigned Branch
+                </label>
+                <select name="assigned_branch" class="form-input" id="assignedBranch">
+                    <option value="">-- No Branch Assigned --</option>
+                    {% for branch in branches %}
+                    <option value="{{ branch.id }}" 
+                        {% if user_obj and user_obj.assigned_branch.id == branch.id %}selected{% endif %}>
+                        {{ branch.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <p class="form-hint">Staff members can only see orders for their assigned branch</p>
+            </div>
+        </div>
+
+        <!-- Verification Status -->
+        <div class="form-section">
+            <h3 class="section-title">
+                <i data-lucide="check-circle"></i>
+                Verification Status
+            </h3>
+
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <input 
+                        type="checkbox" 
+                        id="is_email_verified" 
+                        name="is_email_verified" 
+                        class="checkbox-input"
+                        {% if user_obj and user_obj.is_email_verified %}checked{% endif %}
+                    >
+                    <label for="is_email_verified" class="checkbox-label">
+                        <strong>Email Verified</strong>
+                    </label>
+                </div>
+                <div class="checkbox-description">User has verified their email address</div>
+
+                <div class="checkbox-item">
+                    <input 
+                        type="checkbox" 
+                        id="is_phone_verified" 
+                        name="is_phone_verified" 
+                        class="checkbox-input"
+                        {% if user_obj and user_obj.is_phone_verified %}checked{% endif %}
+                    >
+                    <label for="is_phone_verified" class="checkbox-label">
+                        <strong>Phone Verified</strong>
+                    </label>
+                </div>
+                <div class="checkbox-description">User has verified their phone number</div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="form-actions">
+            <a href="{% url 'dashboard_users' %}" class="btn btn-secondary">
+                <i data-lucide="x"></i>
+                Cancel
+            </a>
+            <button type="submit" class="btn btn-primary">
+                <i data-lucide="save"></i>
+                {% if user_obj %}Update User{% else %}Create User{% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Toggle branch section based on staff checkbox
+    const staffCheckbox = document.getElementById('is_staff');
+    const branchSection = document.getElementById('branchSection');
+
+    function toggleBranchSection() {
+        if (staffCheckbox.checked) {
+            branchSection.style.display = 'block';
+        } else {
+            branchSection.style.display = 'none';
+            document.getElementById('assignedBranch').value = ''; // Clear selection
+        }
+    }
+
+    // Initial check
+    toggleBranchSection();
+
+    // Listen for changes
+    staffCheckbox.addEventListener('change', toggleBranchSection);
+</script>
+{% endblock %}

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin Dashboard{% endblock %} - PeelOJuice</title>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #F9FAFB;
+            color: #111827;
+        }
+
+        /* Sidebar - Monochromatic Black */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 260px;
+            background: #000000;
+            padding: 20px 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 0 20px 30px;
+            border-bottom: 1px solid #1F2937;
+        }
+
+        .sidebar-header h2 {
+            color: #FFFFFF;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .sidebar-header p {
+            color: #9CA3AF;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .sidebar-menu {
+            margin-top: 20px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: #D1D5DB;
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 15px;
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar-menu a:hover {
+            background: #1F2937;
+            color: #FFFFFF;
+            border-left-color: #8BA888;
+        }
+
+        .sidebar-menu a.active {
+            background: #1F2937;
+            border-left-color: #8BA888;
+            color: #FFFFFF;
+        }
+
+        .sidebar-menu a svg {
+            margin-right: 12px;
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 260px;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        /* Top Navbar */
+        .top-navbar {
+            background: #FFFFFF;
+            padding: 15px 30px;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #E5E7EB;
+        }
+
+        .top-navbar h1 {
+            font-size: 24px;
+            color: #111827;
+            font-weight: 700;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info .user-name {
+            font-weight: 500;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logout-btn {
+            padding: 8px 20px;
+            background: #000000;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .logout-btn:hover {
+            background: #1F2937;
+            transform: translateY(-1px);
+        }
+
+        /* Messages */
+        .messages {
+            margin-bottom: 20px;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 0.5rem;
+            margin-bottom: 10px;
+            animation: slideIn 0.3s ease;
+            border-left: 4px solid;
+        }
+
+        .alert-success {
+            background: #F3F4F6;
+            border-left-color: #8BA888;
+            color: #1F2937;
+        }
+
+        .alert-error {
+            background: #F3F4F6;
+            border-left-color: #000000;
+            color: #1F2937;
+        }
+
+        .alert-info {
+            background: #F3F4F6;
+            border-left-color: #6B7280;
+            color: #1F2937;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Content Area */
+        .content-area {
+            background: #FFFFFF;
+            padding: 30px;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid #E5E7EB;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+            }
+
+            .sidebar-header h2,
+            .sidebar-header p {
+                display: none;
+            }
+
+            .sidebar-menu a span {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 70px;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>PeelOJuice</h2>
+            <p>Admin Dashboard</p>
+        </div>
+        <nav class="sidebar-menu">
+            <a href="{% url 'dashboard_home' %}" class="{% if request.resolver_match.url_name == 'dashboard_home' %}active{% endif %}">
+                <i data-lucide="layout-dashboard"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{% url 'dashboard_products' %}" class="{% if 'product' in request.resolver_match.url_name %}active{% endif %}">
+                <i data-lucide="droplet"></i>
+                <span>Products</span>
+            </a>
+            <a href="{% url 'dashboard_orders' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard_orders' or request.resolver_match.url_name == 'dashboard_order_update_status' %}active{% endif %}">
+                <i data-lucide="package"></i>
+                <span>Orders</span>
+            </a>
+            <a href="{% url 'dashboard_payments' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard_payments' %}active{% endif %}">
+                <i data-lucide="credit-card"></i>
+                <span>Payments</span>
+            </a>
+            <a href="{% url 'dashboard_users' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard_users' %}active{% endif %}">
+                <i data-lucide="users"></i>
+                <span>Users</span>
+            </a>
+            <a href="/admin/" target="_blank">
+                <i data-lucide="settings"></i>
+                <span>Django Admin</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Navbar -->
+        <div class="top-navbar">
+            <h1>{% block page_title %}Dashboard{% endblock %}</h1>
+            <div class="user-info">
+                <span class="user-name">
+                    <i data-lucide="user" style="width: 16px; height: 16px;"></i>
+                    {{ request.user.get_full_name|default:request.user.email }}
+                </span>
+                <a href="{% url 'logout' %}" class="logout-btn">
+                    <i data-lucide="log-out" style="width: 16px; height: 16px;"></i>
+                    Logout
+                </a>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Content -->
+        <div class="content-area">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

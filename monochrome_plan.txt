@@ -1,0 +1,23 @@
+# Monochromatic Conversion Script
+
+# Pages with gradients to update:
+# - MyProfile.jsx
+# - Orders.jsx
+# - OrderDetail.jsx
+# - OrderSuccess.jsx
+# - Cart.jsx (CartSummary component)
+# - Checkout.jsx
+# - MyAddresses.jsx
+# - ForgotPassword.jsx
+# - VerifyResetOTP.jsx
+# - Dashboard.jsx
+
+# Color replacements needed:
+# from-purple-* -> from-gray-*
+# to-pink-* -> to-gray-*  
+# to-orange-* -> to-gray-*
+# bg-purple-* -> bg-black or bg-gray-*
+# bg-pink-* -> bg-gray-*
+# text-purple-* -> text-black or text-gray-*
+
+# For simplicity: replace all gradients with solid black or gray
