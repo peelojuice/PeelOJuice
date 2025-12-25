@@ -149,14 +149,17 @@ DEFAULT_FROM_EMAIL = 'Juice Shop <peelojuice0@gmail.com>'
 # Frontend URL for email links
 FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:5173')
 
-# CORS Settings
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "http://localhost:5174",
-    "http://127.0.0.1:5174",
-]
+# CORS settings
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173',  # Local development
+    'http://127.0.0.1:5173',
+    'https://*.vercel.app',  # Vercel deployment
+    'https://vercel.app',
+    'capacitor://localhost',  # Mobile apps
+    'http://localhost',
+]
+CORS_ALLOW_ALL_ORIGINS = False  # Keep this False for security
 
 
 # Internationalization
