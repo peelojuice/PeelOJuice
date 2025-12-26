@@ -34,15 +34,22 @@ class RegisterAPIView(APIView):
 
             user = serializer.save()
 
-            email_otp = generate_email_otp(user)
+            # generate_email_otp now returns (otp, email_sent_successfully)
+            email_otp, email_sent = generate_email_otp(user)
             phone_otp = generate_phone_otp(user)
 
+            response_data = {
+                "message": "User registered successfully. Please check your email for OTP.",
+                "phone_otp": phone_otp  # DEV ONLY - Remove in production
+            }
+            
+            # Only include email_otp if email sending failed (for debugging)
+            if not email_sent:
+                response_data["email_otp"] = email_otp
+                response_data["warning"] = "Email delivery may have failed. OTP shown for testing."
+
             return Response(
-                {
-                    "message": "User registered successfully. Please check your email for OTP.",
-                    "email_otp": email_otp,  # TEMP - For testing while Gmail SMTP is being fixed
-                    "phone_otp": phone_otp  # DEV ONLY - Remove in production
-                },
+                response_data,
                 status=status.HTTP_201_CREATED
             )
         return Response(
@@ -141,12 +148,21 @@ class ResendEmailOTPAPIView(APIView):
                 status=status.HTTP_429_TOO_MANY_REQUESTS
             )
 
-        generate_email_otp(user)
-
-        return Response(
-            {"message": "OTP sent to your email"},
-            status=status.HTTP_200_OK
-        )
+        email_otp, email_sent = generate_email_otp(user)
+        
+        if email_sent:
+            return Response(
+                {"message": "OTP sent to your email"},
+                status=status.HTTP_200_OK
+            )
+        else:
+            return Response(
+                {
+                    "message": "Failed to send OTP email",
+                    "email_otp": email_otp  # Fallback for testing
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 class ResendPhoneOTPAPIView(APIView):
     def post(self, request):
@@ -248,12 +264,21 @@ class RequestPasswordResetOTPAPIView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
         
-        generate_password_reset_otp(user)
+        password_reset_otp, email_sent = generate_password_reset_otp(user)
         
-        return Response(
-            {"message": "OTP sent to your email"},
-            status=status.HTTP_200_OK
-        )
+        if email_sent:
+            return Response(
+                {"message": "OTP sent to your email"},
+                status=status.HTTP_200_OK
+            )
+        else:
+            return Response(
+                {
+                    "message": "Failed to send password reset email",
+                    "password_reset_otp": password_reset_otp  # Fallback for testing
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 class ConfirmPasswordResetAPIView(APIView):
     
