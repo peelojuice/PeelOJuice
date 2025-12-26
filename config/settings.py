@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 
-# Test deployment - data persistence verification
+# Test deployment - data persistence verification (Dec 26, 2025)
 """
 
 from pathlib import Path
