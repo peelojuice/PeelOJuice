@@ -143,15 +143,18 @@ SIMPLE_JWT = {
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
+# Brevo (formerly Sendinblue) SMTP - Works on Railway!
+EMAIL_HOST = config('EMAIL_HOST', default='smtp-relay.brevo.com')
+EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
 EMAIL_USE_TLS = True
-EMAIL_TIMEOUT = 30  # Increase timeout to check if Gmail is just slow
+EMAIL_TIMEOUT = 10  # Reduced timeout for Railway worker compatibility
 
-EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='peelojuice0@gmail.com')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='xkzk pddx qhrj loly')
+# IMPORTANT: Set EMAIL_HOST_USER and EMAIL_HOST_PASSWORD in Railway environment variables
+# DO NOT hardcode credentials in this file for security
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 
-DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='Juice Shop <peelojuice0@gmail.com>')
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='PeelOJuice <peelojuice0@gmail.com>')
 
 # Frontend URL for email links
 FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:5173')
