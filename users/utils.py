@@ -16,7 +16,11 @@ def generate_email_otp(user):
         'is_email_verified'
     ])
 
-    send_otp_email(user.email, otp, purpose="verification")
+    try:
+        send_otp_email(user.email, otp, purpose="verification")
+    except Exception as e:
+        # Log the error but don't fail registration
+        print(f"Failed to send email OTP: {e}")
 
     return otp
 
@@ -40,16 +44,18 @@ def generate_password_reset_otp(user):
     
     user.password_reset_otp = otp
     user.password_reset_otp_created_at = timezone.now()
-    user.password_reset_otp_verified = False
     
     user.save(update_fields=[
         'password_reset_otp',
-        'password_reset_otp_created_at',
-        'password_reset_otp_verified'
+        'password_reset_otp_created_at'
     ])
     
-    send_otp_email(user.email, otp, purpose="password_reset")
-
+    try:
+        send_otp_email(user.email, otp, purpose="password_reset")
+    except Exception as e:
+        # Log the error but don't fail the password reset process
+        print(f"Failed to send password reset email: {e}")
+    
     return otp
 
 
