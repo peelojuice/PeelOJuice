@@ -112,7 +112,8 @@ import dj_database_url
 DATABASES = {
     'default': dj_database_url.config(
         default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
-        conn_max_age=600
+        conn_max_age=600,
+        conn_health_checks=True,
     )
 }
 AUTH_USER_MODEL = 'users.User'
@@ -164,8 +165,8 @@ CORS_ALLOWED_ORIGINS = [
 
 # Use regex to allow all Vercel domains and Railway domains
 CORS_ALLOWED_ORIGIN_REGEXES = [
-    r"^https://.*\.vercel\.app$",  # Any Vercel deployment
-    r"^https://.*\.up\.railway\.app$",  # Any Railway deployment
+    r"^https://.*\.vercel\.app$",
+    r"^https://.*\.up\.railway\.app$",
 ]
 
 CORS_ALLOW_ALL_ORIGINS = False  # Keep this False for security
@@ -214,9 +215,8 @@ CORS_ALLOWED_ORIGINS = [
 
 CORS_ALLOW_CREDENTIALS = True
 
-# =====================================================
+
 # CLOUDINARY CONFIGURATION
-# =====================================================
 # Get these from your Cloudinary Dashboard:
 # https://console.cloudinary.com/
 
