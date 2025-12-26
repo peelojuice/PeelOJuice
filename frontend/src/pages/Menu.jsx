@@ -27,12 +27,10 @@ export default function Menu() {
   }, []);
 
   useEffect(() => {
-    if (selectedBranch) {
-      setJuices([]);
-      setPage(1);
-      setHasMore(true);
-      fetchJuices(1, true);
-    }
+    setJuices([]);
+    setPage(1);
+    setHasMore(true);
+    fetchJuices(1, true);
   }, [selectedCategory, selectedBranch]); // Added selectedBranch to dependencies
 
   const fetchCategories = async () => {
