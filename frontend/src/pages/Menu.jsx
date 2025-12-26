@@ -22,6 +22,8 @@ export default function Menu() {
 
   useEffect(() => {
     fetchCategories();
+    // Fetch juices on initial load
+    fetchJuices(1, true);
   }, []);
 
   useEffect(() => {
@@ -43,23 +45,25 @@ export default function Menu() {
   };
 
 
-  const fetchJuices = async (pageNum, reset = false) => {
-    if (!selectedBranch) {
-      setLoading(false);
-      setLoadingMore(false);
-      return;
-    }
+  const fetchJuices = async (pageNum, reset = false) =>{
     if (!hasMore && !reset) return;
     
     setLoadingMore(true);
     try {
-      // Use branch-specific products endpoint with pagination
       const params = { page: pageNum };
       if (selectedCategory !== 'all') {
         params.category_id = selectedCategory;
       }
       
-      const response = await api.get(`/products/branches/${selectedBranch.id}/products/`, { params });
+      let response;
+      // If branch is selected, use branch-specific endpoint
+      // Otherwise, fallback to general juices endpoint
+      if (selectedBranch) {
+        response = await api.get(`/products/branches/${selectedBranch.id}/products/`, { params });
+      } else {
+        response = await api.get(`/products/juices/`, { params });
+      }
+      
       const newJuices = response.data.results || response.data;
       
       if (reset) {
