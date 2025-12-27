@@ -20,7 +20,7 @@ export default function Navbar() {
             <span className="text-2xl font-bold">
               <span className="text-[#F5A623]">Peel</span>
               <span className="text-[#FF6B35]">O</span>
-              <span className="text-[#8BA888]">JUICE</span>
+              <span className="text-[#2D5016]">JUICE</span>
             </span>
           </Link>
 
