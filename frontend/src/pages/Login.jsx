@@ -41,7 +41,7 @@ export default function Login() {
             <div className="text-4xl font-bold">
               <span className="text-[#F5A623]">Peel</span>
               <span className="text-[#FF6B35]">O</span>
-              <span className="text-gray-800">JUICE</span>
+              <span className="text-[#8BA888]">JUICE</span>
             </div>
           </div>
           <p className="text-sm text-gray-500">Pure. Fresh. Nourishing.</p>

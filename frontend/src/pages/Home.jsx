@@ -3,10 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { Search, User, ShoppingCart, Leaf } from 'lucide-react';
 import api, { BASE_URL } from '../services/api';
 import { useBranch } from '../context/BranchContext';
+import { useCart } from '../context/CartContext';
+import { useToast } from '../context/ToastContext';
 
 export default function Home() {
   const navigate = useNavigate();
   const { selectedBranch } = useBranch();
+  const { addToCart } = useCart();
+  const { showToast } = useToast();
   const [products, setProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
@@ -37,9 +41,20 @@ export default function Home() {
     }
   };
 
-  const addToCart = (product) => {
-    // Add to cart logic
-    console.log('Add to cart:', product);
+  const handleAddToCart = async (product) => {
+    const accessToken = sessionStorage.getItem('accessToken');
+    if (!accessToken) {
+      showToast('Please login to add items to cart', 'warning');
+      navigate('/login');
+      return;
+    }
+
+    const result = await addToCart(product.id, 1);
+    if (result.success) {
+      showToast('Added to cart!', 'success');
+    } else {
+      showToast('Failed to add to cart', 'error');
+    }
   };
 
   // Scroll-based zoom animation (same as Menu page)
@@ -130,7 +145,7 @@ export default function Home() {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        addToCart(product);
+                        handleAddToCart(product);
                       }}
                       className="px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition font-medium text-sm flex items-center gap-2"
                     >
