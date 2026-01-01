@@ -61,14 +61,19 @@ def generate_password_reset_otp(user):
         'password_reset_otp',
         'password_reset_otp_created_at'
     ])
+    logger.info(f"Generated password reset OTP for user: {user.email}")
     
+    # Use Brevo API instead of SMTP (Railway blocks SMTP ports)
     try:
-        send_otp_email(user.email, otp, purpose="password_reset")
+        email_sent = send_otp_email_api(user.email, otp, purpose="password_reset")
     except Exception as e:
-        # Log the error but don't fail the password reset process
-        print(f"Failed to send password reset email: {e}")
+        logger.error(f"Email API error for password reset: {str(e)}")
+        email_sent = False
     
-    return otp
+    if not email_sent:
+        logger.error(f"Failed to send password reset email to {user.email}")
+    
+    return otp, email_sent
 
 
 
