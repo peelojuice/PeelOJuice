@@ -8,6 +8,7 @@ from django.views import View
 from .utils import generate_email_otp, generate_phone_otp, generate_password_reset_otp
 from rest_framework_simplejwt.tokens import RefreshToken
 from .views_verify import is_otp_expired
+from .models import User
 
 from .serializers import RegisterSerializer, UserSerializer
 
