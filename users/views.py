@@ -98,6 +98,18 @@ class LoginAPIView(APIView):
             )
         
         refresh = RefreshToken.for_user(user)
+        
+        # Prepare assigned_branch data for staff users
+        assigned_branch_data = None
+        if user.is_staff and user.assigned_branch:
+            assigned_branch_data = {
+                'id': user.assigned_branch.id,
+                'name': user.assigned_branch.name,
+                'city': user.assigned_branch.city,
+                'address': user.assigned_branch.address,
+                'phone': user.assigned_branch.phone,
+                'email': user.assigned_branch.email
+            }
 
         return Response(
             {
@@ -108,7 +120,9 @@ class LoginAPIView(APIView):
                 "user": {
                     "email": user.email,
                     "full_name": user.full_name,
-                    "phone_number": user.phone_number
+                    "phone_number": user.phone_number,
+                    "is_staff": user.is_staff,
+                    "assigned_branch": assigned_branch_data
                 }
             },
             status=status.HTTP_200_OK

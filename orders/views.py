@@ -228,6 +228,68 @@ class MyOrdersAPIView(APIView):
             "orders": serializer.data
         })
 
+class StaffOrdersAPIView(APIView):
+    """
+    REST API endpoint for staff to get orders assigned to their branch.
+    Used by staff mobile app.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        
+        # Check if user is staff
+        if not user.is_staff:
+            return Response(
+                {"detail": "Only staff members can access this endpoint"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Check if staff has assigned branch
+        if not user.assigned_branch:
+            return Response(
+                {"detail": "No branch assigned. Please contact administrator."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Get status filter from query params
+        status_filter = request.query_params.get('status')
+        
+        # Get orders for this staff member's assigned branch
+        orders = Order.objects.filter(
+            branch=user.assigned_branch
+        ).order_by('-created_at')
+        
+        # Apply status filtering if provided
+        if status_filter == 'ongoing':
+            orders = orders.filter(
+                status__in=[
+                    'pending',
+                    'confirmed',
+                    'preparing',
+                    'out_for_delivery'
+                ]
+            )
+        elif status_filter == 'delivered':
+            orders = orders.filter(status='delivered')
+        elif status_filter == 'cancelled':
+            orders = orders.filter(status='cancelled')
+        elif status_filter:
+            # If a specific status is provided
+            orders = orders.filter(status=status_filter)
+        
+        serializer = MyOrderListSerializer(orders, many=True)
+        
+        return Response({
+            "count": orders.count(),
+            "orders": serializer.data,
+            "branch": {
+                "id": user.assigned_branch.id,
+                "name": user.assigned_branch.name,
+                "city": user.assigned_branch.city
+            }
+        })
+
 class OrderDetailAPIView(RetrieveAPIView):
     serializer_class = OrderDetailSerializer
     permission_classes = [IsAuthenticated]
