@@ -81,11 +81,13 @@ class OrderDetailSerializer(serializers.ModelSerializer):
     payment_method = serializers.SerializerMethodField()
     payment_status = serializers.SerializerMethodField()
     can_cancel = serializers.SerializerMethodField()
+    user = serializers.SerializerMethodField()
     
     class Meta:
         model = Order
         fields = [
             'id',
+            'order_number',
             'user',
             'items',
             'status',
@@ -103,6 +105,15 @@ class OrderDetailSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at'
         ]
+    
+    def get_user(self, obj):
+        """Return user details for mobile app"""
+        return {
+            'id': obj.user.id,
+            'email': obj.user.email,
+            'full_name': obj.user.full_name,
+            'phone_number': obj.user.phone_number
+        }
     
     def get_payment_method(self, obj):
         if hasattr(obj, 'payment'):
