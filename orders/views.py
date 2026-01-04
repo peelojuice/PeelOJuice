@@ -290,6 +290,47 @@ class StaffOrdersAPIView(APIView):
             }
         })
 
+class StaffOrderDetailAPIView(APIView):
+    """
+    REST API endpoint for staff to get a specific order detail.
+    Only returns orders from the staff's assigned branch.
+    """
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, pk):
+        user = request.user
+        
+        # Check if user is staff
+        if not user.is_staff:
+            return Response(
+                {"detail": "Only staff members can access this endpoint"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Check if staff has assigned branch
+        if not user.assigned_branch:
+            return Response(
+                {"detail": "No branch assigned. Please contact administrator."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Get order from staff's branch only
+        try:
+            order = Order.objects.select_related(
+                'user', 'branch'
+            ).prefetch_related('items__juice').get(
+                pk=pk,
+                branch=user.assigned_branch
+            )
+        except Order.DoesNotExist:
+            return Response(
+                {"detail": "Order not found or not assigned to your branch"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        serializer = OrderDetailSerializer(order)
+        return Response(serializer.data)
+
 class OrderDetailAPIView(RetrieveAPIView):
     serializer_class = OrderDetailSerializer
     permission_classes = [IsAuthenticated]
