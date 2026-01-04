@@ -20,10 +20,18 @@ class CheckoutAPIView(APIView):
         
         user = request.user
         payment_method = request.data.get('payment_method', 'cod')
+        branch_id = request.data.get('branch_id')
 
         if payment_method not in ['cod', 'online']:
             return Response(
                 {"detail": "Invalid payment method. Choose 'cod' or 'online'"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Validate branch selection
+        if not branch_id:
+            return Response(
+                {"detail": "Branch selection is required. Please select a branch before checkout."},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -57,15 +65,16 @@ class CheckoutAPIView(APIView):
                 print(f"[ERROR] Coupon discount calculation failed: {str(e)}")
                 discount = 0
 
-        # Assign order to first active branch
+        # Get the selected branch from request
         from products.models import Branch
         try:
-            branch = Branch.objects.filter(is_active=True).first()
-            if not branch:
-                return Response(
-                    {"detail": "No active branch found. Please contact administrator."},
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
+            branch = Branch.objects.get(id=branch_id, is_active=True)
+            print(f"[SUCCESS] Branch selected: ID={branch.id}, Name={branch.name}")
+        except Branch.DoesNotExist:
+            return Response(
+                {"detail": "Selected branch not found or is inactive. Please select a valid branch."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         except Exception as e:
             print(f"[ERROR] Branch fetch failed: {str(e)}")
             return Response(

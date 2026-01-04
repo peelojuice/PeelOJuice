@@ -5,6 +5,7 @@ import api from '../services/api';
 import addressAPI from '../services/addressAPI';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
+import { useBranch } from '../context/BranchContext';
 import AddressForm from '../components/AddressForm';
 
 export default function Checkout() {
@@ -17,6 +18,7 @@ export default function Checkout() {
   const navigate = useNavigate();
   const { clearCart } = useCart();
   const { showToast } = useToast();
+  const { selectedBranch } = useBranch();
 
   useEffect(() => {
     fetchAddresses();
@@ -51,6 +53,11 @@ export default function Checkout() {
   };
 
   const handleCheckout = async () => {
+    if (!selectedBranch) {
+      showToast('Please select a branch from the top navigation', 'error');
+      return;
+    }
+
     if (!selectedAddress) {
       showToast('Please select a delivery address', 'error');
       return;
@@ -60,7 +67,8 @@ export default function Checkout() {
     try {
       const response = await api.post('/orders/checkout/', {
         payment_method: paymentMethod,
-        address_id: selectedAddress
+        address_id: selectedAddress,
+        branch_id: selectedBranch.id
       });
 
       if (paymentMethod === 'online') {
