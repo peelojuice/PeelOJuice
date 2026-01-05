@@ -376,3 +376,30 @@ class CustomLoginView(LoginView):
             return redirect('/dashboard/')
         else:
             return redirect('/')
+
+
+class UpdateFCMTokenAPIView(APIView):
+    """
+    API endpoint for mobile apps to register/update their FCM device token.
+    Used for push notifications for both staff and customer apps.
+    """
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        user = request.user
+        fcm_token = request.data.get('fcm_token')
+        
+        if not fcm_token:
+            return Response(
+                {"detail": "fcm_token is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Update user's FCM token
+        user.fcm_token = fcm_token
+        user.save()
+        
+        return Response({
+            "message": "FCM token updated successfully",
+            "fcm_token": fcm_token
+        }, status=status.HTTP_200_OK)

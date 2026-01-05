@@ -60,6 +60,14 @@ class User(AbstractBaseUser, PermissionsMixin):
         help_text="Branch this staff member is assigned to (for branch-specific access)"
     )
     
+    # Firebase Cloud Messaging token for push notifications
+    fcm_token = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text="Firebase Cloud Messaging device token for push notifications"
+    )
+    
     created_at = models.DateTimeField(auto_now_add=True)
     
     USERNAME_FIELD = 'email'

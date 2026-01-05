@@ -21,6 +21,7 @@ urlpatterns = [
     path('logout/', LogoutAPIView.as_view(), name='logout'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('profile/', ProfileAPIView.as_view(), name='profile'),
+    path('fcm-token/', UpdateFCMTokenAPIView.as_view(), name='fcm-token'),
     
     path('verify-email/', VerifyEmailOTPAPIView.as_view(), name='verify-email'),
     path('verify-phone/', VerifyPhoneOTPAPIView.as_view(), name='verify-phone'),
