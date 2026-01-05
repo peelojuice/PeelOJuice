@@ -7,19 +7,32 @@ import firebase_admin
 from firebase_admin import credentials, messaging
 from django.conf import settings
 import os
+import json
 import logging
 
 logger = logging.getLogger(__name__)
 
 # Initialize Firebase Admin SDK (will only initialize once)
 try:
-    cred_path = os.path.join(settings.BASE_DIR, 'firebase-credentials.json')
-    if os.path.exists(cred_path):
-        cred = credentials.Certificate(cred_path)
+    # Check if Firebase credentials are provided as environment variable (Railway)
+    firebase_creds_json = os.getenv('FIREBASE_CREDENTIALS_JSON')
+    
+    if firebase_creds_json:
+        # Railway deployment - credentials from environment variable
+        logger.info("Using Firebase credentials from environment variable")
+        cred_dict = json.loads(firebase_creds_json)
+        cred = credentials.Certificate(cred_dict)
         firebase_admin.initialize_app(cred)
-        logger.info("Firebase Admin SDK initialized successfully")
+        logger.info("Firebase Admin SDK initialized successfully from env var")
     else:
-        logger.warning(f"Firebase credentials file not found at {cred_path}")
+        # Local development - credentials from file
+        cred_path = os.path.join(settings.BASE_DIR, 'firebase-credentials.json')
+        if os.path.exists(cred_path):
+            cred = credentials.Certificate(cred_path)
+            firebase_admin.initialize_app(cred)
+            logger.info("Firebase Admin SDK initialized successfully from file")
+        else:
+            logger.warning(f"Firebase credentials not found. Notifications will not work.")
 except ValueError:
     # Already initialized
     logger.info("Firebase Admin SDK already initialized")
