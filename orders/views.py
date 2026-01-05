@@ -171,7 +171,7 @@ class CheckoutAPIView(APIView):
         # Send order confirmation email (non-critical)
         try:
             email_sent = send_order_confirmation_email(order, user)
-            if email_sent):
+            if email_sent:
                 print(f"[SUCCESS] Order confirmation email sent to {user.email}")
             else:
                 print(f"[WARNING] Email sending returned False for order #{order.id}")
