@@ -25,6 +25,13 @@ try:
         logger.info("Using Firebase credentials from environment variable")
         cred_dict = json.loads(firebase_creds_json)
         print(f"[DEBUG] Parsed credential dict, type: {cred_dict.get('type')}, project: {cred_dict.get('project_id')}")
+        
+        # Fix: Replace escaped newlines with actual newlines in private_key
+        # Railway stores \n as literal \\n, we need to convert them back
+        if 'private_key' in cred_dict and '\\n' in cred_dict['private_key']:
+            print("[DEBUG] Converting escaped newlines in private_key...")
+            cred_dict['private_key'] = cred_dict['private_key'].replace('\\n', '\n')
+        
         cred = credentials.Certificate(cred_dict)
         firebase_admin.initialize_app(cred)
         print("✅ Firebase Admin SDK initialized successfully from env var")
