@@ -13,30 +13,40 @@ import logging
 logger = logging.getLogger(__name__)
 
 # Initialize Firebase Admin SDK (will only initialize once)
+print("[DEBUG] Starting Firebase initialization...")
 try:
     # Check if Firebase credentials are provided as environment variable (Railway)
     firebase_creds_json = os.getenv('FIREBASE_CREDENTIALS_JSON')
+    print(f"[DEBUG] firebase_creds_json env var exists: {bool(firebase_creds_json)}")
     
     if firebase_creds_json:
         # Railway deployment - credentials from environment variable
+        print("[INFO] Using Firebase credentials from environment variable")
         logger.info("Using Firebase credentials from environment variable")
         cred_dict = json.loads(firebase_creds_json)
+        print(f"[DEBUG] Parsed credential dict, type: {cred_dict.get('type')}, project: {cred_dict.get('project_id')}")
         cred = credentials.Certificate(cred_dict)
         firebase_admin.initialize_app(cred)
+        print("✅ Firebase Admin SDK initialized successfully from env var")
         logger.info("Firebase Admin SDK initialized successfully from env var")
     else:
         # Local development - credentials from file
         cred_path = os.path.join(settings.BASE_DIR, 'firebase-credentials.json')
+        print(f"[DEBUG] Checking for file at: {cred_path}")
         if os.path.exists(cred_path):
             cred = credentials.Certificate(cred_path)
             firebase_admin.initialize_app(cred)
+            print("✅ Firebase Admin SDK initialized successfully from file")
             logger.info("Firebase Admin SDK initialized successfully from file")
         else:
+            print(f"⚠️ Firebase credentials not found. Notifications will not work.")
             logger.warning(f"Firebase credentials not found. Notifications will not work.")
-except ValueError:
+except ValueError as e:
     # Already initialized
+    print(f"ℹ️ Firebase Admin SDK already initialized (ValueError: {e})")
     logger.info("Firebase Admin SDK already initialized")
 except Exception as e:
+    print(f"❌ Error initializing Firebase Admin SDK: {e}")
     logger.error(f"Error initializing Firebase Admin SDK: {e}")
 
 
