@@ -17,7 +17,8 @@ class CartItemSerializer(serializers.ModelSerializer):
             'juice_image',
             'quantity',
             'price_at_added',
-            'subtotal'
+            'subtotal',
+            'cooking_instructions'
         ]
     
     def get_juice_image(self, obj):

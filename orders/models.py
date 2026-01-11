@@ -149,6 +149,12 @@ class OrderItem(models.Model):
         decimal_places=2,
         help_text="Price at time of order"
     )
+    cooking_instructions = models.CharField(
+        max_length=200,
+        blank=True,
+        default='',
+        help_text='Special cooking instructions from customer'
+    )
 
     @property
     def subtotal(self):

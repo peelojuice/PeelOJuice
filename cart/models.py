@@ -47,6 +47,12 @@ class CartItem(models.Model):
         max_digits=8,
         decimal_places=2
     )
+    cooking_instructions = models.CharField(
+        max_length=200,
+        blank=True,
+        default='',
+        help_text='Special cooking instructions (e.g., less sugar, extra ice)'
+    )
 
     class Meta:
         unique_together = ('cart', 'juice')
