@@ -17,10 +17,12 @@ class CheckoutAPIView(APIView):
     @transaction.atomic
     def post(self, request):
         from payments.models import Payment
+        from addresses.models import Address
         
         user = request.user
         payment_method = request.data.get('payment_method', 'cod')
         branch_id = request.data.get('branch_id')
+        address_id = request.data.get('address_id')
 
         if payment_method not in ['cod', 'online']:
             return Response(
@@ -32,6 +34,13 @@ class CheckoutAPIView(APIView):
         if not branch_id:
             return Response(
                 {"detail": "Branch selection is required. Please select a branch before checkout."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Validate address selection
+        if not address_id:
+            return Response(
+                {"detail": "Delivery address is required."},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -82,21 +91,48 @@ class CheckoutAPIView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-        # Calculate delivery fee (free if subtotal >= 99, otherwise 20)
-        # This matches the cart serializer logic to ensure payment amount consistency
-        delivery_fee_base = Decimal('0.00') if food_subtotal >= Decimal('99.00') else Decimal('20.00')
+        # Get the selected address
+        try:
+            address = Address.objects.get(id=address_id, user=user)
+        except Address.DoesNotExist:
+            return Response(
+                {"detail": "Address not found."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Validate Delivery Zone and Calculate Fee
+        CORE_PINCODES = ['520010', '520008', '520004', '520002']
+        SECONDARY_PINCODES = ['520003', '520007', '520001', '520013', '520011', '521137']
+        
+        pincode = address.pincode.strip() if address.pincode else ''
+        delivery_fee_base = Decimal('20.00')
+        
+        if pincode in CORE_PINCODES:
+            delivery_fee_base = Decimal('20.00')
+        elif pincode in SECONDARY_PINCODES:
+            delivery_fee_base = Decimal('40.00')
+        else:
+            return Response(
+                {"detail": f"Sorry, we do not deliver to pincode {pincode} yet."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Free delivery check
+        if food_subtotal >= Decimal('99.00'):
+            delivery_fee_base = Decimal('0.00')
 
         # Create order
         try:
             order = Order.objects.create(
                 user=user,
                 branch=branch,
+                address=address,
                 food_subtotal=food_subtotal,
                 delivery_fee_base=delivery_fee_base,
                 platform_fee=10,
                 discount=discount
             )
-            print(f"[SUCCESS] Order created: ID={order.id}, Branch={branch.name}")
+            print(f"[SUCCESS] Order created: ID={order.id}, Branch={branch.name}, Fee={delivery_fee_base}")
         except Exception as e:
             print(f"[ERROR] Order creation failed: {str(e)}")
             import traceback
@@ -113,7 +149,8 @@ class CheckoutAPIView(APIView):
                     order=order,
                     juice=item.juice,
                     quantity=item.quantity,
-                    price_per_item=item.price_at_added
+                    price_per_item=item.price_at_added,
+                    cooking_instructions=item.cooking_instructions
                 )
             print(f"[SUCCESS] Created {cart_items.count()} order items")
         except Exception as e:

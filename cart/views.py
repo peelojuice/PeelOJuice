@@ -213,3 +213,45 @@ class RemoveCouponAPIView(APIView):
             "message": "Coupon removed successfully",
             "cart": serializer.data
         }, status=status.HTTP_200_OK)
+
+class UpdateItemInstructionsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        juice_id = request.data.get('juice_id')
+        instructions = request.data.get('instructions', '')
+
+        if not juice_id:
+            return Response(
+                {"message": "Juice ID is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        cart = Cart.objects.filter(user=request.user, is_active=True).first()
+        if not cart:
+            return Response(
+                {"message": "Cart not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        try:
+            item = CartItem.objects.get(cart=cart, juice_id=juice_id)
+            # Truncate if too long (backup check)
+            if len(instructions) > 200:
+                instructions = instructions[:200]
+            
+            item.cooking_instructions = instructions
+            item.save()
+            
+            return Response(
+                {
+                    "message": "Instructions updated",
+                    "instructions": item.cooking_instructions
+                },
+                status=status.HTTP_200_OK
+            )
+        except CartItem.DoesNotExist:
+            return Response(
+                {"message": "Item not in cart"},
+                status=status.HTTP_404_NOT_FOUND
+            )

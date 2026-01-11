@@ -37,6 +37,16 @@ class Order(models.Model):
         related_name='orders',
         help_text="Branch from which this order will be fulfilled"
     )
+
+    # Delivery Address
+    address = models.ForeignKey(
+        'addresses.Address',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='orders',
+        help_text="Delivery address for this order"
+    )
     
     food_subtotal = models.DecimalField(
         max_digits=10,

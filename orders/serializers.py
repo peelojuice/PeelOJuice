@@ -13,7 +13,8 @@ class OrderItemSerializer(serializers.ModelSerializer):
             'juice_name',
             'quantity',
             'price_per_item',
-            'subtotal'
+            'subtotal',
+            'cooking_instructions'
         )
 
 
@@ -72,7 +73,8 @@ class OrderItemDetailSerializer(serializers.ModelSerializer):
             'juice_name',
             'quantity',
             'price_per_item',
-            'subtotal'
+            'subtotal',
+            'cooking_instructions'
         )
 
 class OrderDetailSerializer(serializers.ModelSerializer):
