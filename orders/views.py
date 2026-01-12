@@ -395,6 +395,80 @@ class StaffOrderDetailAPIView(APIView):
         
         serializer = OrderDetailSerializer(order)
         return Response(serializer.data)
+    
+    def patch(self, request, pk):
+        """Allow staff to update order status"""
+        user = request.user
+        
+        # Check if user is staff
+        if not user.is_staff:
+            return Response(
+                {"detail": "Only staff members can update orders"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Check if staff has assigned branch
+        if not user.assigned_branch:
+            return Response(
+                {"detail": "No branch assigned. Please contact administrator."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Get new status from request
+        new_status = request.data.get('status')
+        
+        if not new_status:
+            return Response(
+                {"detail": "Status is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Staff can only update to these statuses
+        ALLOWED_STATUSES = ['pending', 'confirmed', 'preparing', 'out_for_delivery']
+        
+        if new_status not in ALLOWED_STATUSES:
+            return Response(
+                {"detail": f"Invalid status. Staff can only set: {', '.join(ALLOWED_STATUSES)}"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Get order from staff's branch only
+        try:
+            order = Order.objects.get(
+                pk=pk,
+                branch=user.assigned_branch
+            )
+        except Order.DoesNotExist:
+            return Response(
+                {"detail": "Order not found or not assigned to your branch"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Don't allow changes to delivered or cancelled orders
+        if order.status == 'delivered':
+            return Response(
+                {"detail": "Cannot modify delivered orders"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        if order.status == 'cancelled':
+            return Response(
+                {"detail": "Cannot modify cancelled orders"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Update status
+        order.status = new_status
+        order.save()
+        
+        return Response(
+            {
+                "message": "Order status updated successfully",
+                "order_id": order.id,
+                "status": order.status
+            },
+            status=status.HTTP_200_OK
+        )
 
 class OrderDetailAPIView(RetrieveAPIView):
     serializer_class = OrderDetailSerializer
