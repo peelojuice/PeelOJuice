@@ -216,32 +216,36 @@ class CheckoutAPIView(APIView):
             print(f"[WARNING] Email failed for order #{order.id}: {str(e)}")
 
         # Send push notifications to branch staff
-        try:
-            from users.fcm_service import send_new_order_notification
-            from users.models import User
-            
-            # Get all active staff members assigned to this branch with FCM tokens
-            branch_staff = User.objects.filter(
-                assigned_branch=branch,
-                is_staff=True,
-                is_active=True,
-                fcm_token__isnull=False  # Only staff with registered FCM tokens
-            ).exclude(fcm_token='')
-            
-            # Send notification to each staff member
-            notification_count = 0
-            for staff_member in branch_staff:
-                if send_new_order_notification(staff_member.fcm_token, order):
-                    notification_count += 1
-            
-            if notification_count > 0:
-                print(f"[SUCCESS] Sent notifications to {notification_count} staff members for order #{order.order_number}")
-            else:
-                print(f"[WARNING] No staff notifications sent for order #{order.order_number} (no staff with FCM tokens)")
+        # Only send for COD orders - online payment orders will send after payment verification
+        if payment_method == 'cod':
+            try:
+                from users.fcm_service import send_new_order_notification
+                from users.models import User
                 
-        except Exception as e:
-            # Don't fail the order if notification fails
-            print(f"[ERROR] Failed to send notifications: {str(e)}")
+                # Get all active staff members assigned to this branch with FCM tokens
+                branch_staff = User.objects.filter(
+                    assigned_branch=branch,
+                    is_staff=True,
+                    is_active=True,
+                    fcm_token__isnull=False  # Only staff with registered FCM tokens
+                ).exclude(fcm_token='')
+                
+                # Send notification to each staff member
+                notification_count = 0
+                for staff_member in branch_staff:
+                    if send_new_order_notification(staff_member.fcm_token, order):
+                        notification_count += 1
+                
+                if notification_count > 0:
+                    print(f"[SUCCESS] Sent notifications to {notification_count} staff members for order #{order.order_number}")
+                else:
+                    print(f"[WARNING] No staff notifications sent for order #{order.order_number} (no staff with FCM tokens)")
+                    
+            except Exception as e:
+                # Don't fail the order if notification fails
+                print(f"[ERROR] Failed to send notifications: {str(e)}")
+        else:
+            print(f"[INFO] Skipping staff notification for online payment order #{order.order_number} - will send after payment verification")
 
         # Serialize and return
         try:

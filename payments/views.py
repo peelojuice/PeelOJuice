@@ -183,6 +183,7 @@ class VerifyRazorpayPaymentAPIView(APIView):
             payment.order.status = 'confirmed'
             payment.order.save()
             
+            
             # Clear cart after successful online payment
             # This ensures cart is only cleared when payment actually succeeds
             from cart.models import Cart, CartItem
@@ -193,6 +194,38 @@ class VerifyRazorpayPaymentAPIView(APIView):
                 cart.save()
             except Cart.DoesNotExist:
                 pass  # Cart already cleared or doesn't exist
+            
+            # Send push notifications to branch staff after successful payment
+            try:
+                from users.fcm_service import send_new_order_notification
+                from users.models import User
+                
+                order = payment.order
+                branch = order.branch
+                
+                if branch:
+                    # Get all active staff members assigned to this branch with FCM tokens
+                    branch_staff = User.objects.filter(
+                        assigned_branch=branch,
+                        is_staff=True,
+                        is_active=True,
+                        fcm_token__isnull=False
+                    ).exclude(fcm_token='')
+                    
+                    # Send notification to each staff member
+                    notification_count = 0
+                    for staff_member in branch_staff:
+                        if send_new_order_notification(staff_member.fcm_token, order):
+                            notification_count += 1
+                    
+                    if notification_count > 0:
+                        print(f"[SUCCESS] Sent notifications to {notification_count} staff members for online payment order #{order.order_number}")
+                    else:
+                        print(f"[WARNING] No staff notifications sent for order #{order.order_number}")
+                        
+            except Exception as e:
+                # Don't fail the payment verification if notification fails
+                print(f"[ERROR] Failed to send notifications: {str(e)}")
 
             return Response(
                 {
