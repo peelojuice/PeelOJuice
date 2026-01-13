@@ -174,14 +174,27 @@ class VerifyRazorpayPaymentAPIView(APIView):
             )
 
         if verify_razorpay_signature(razorpay_order_id, razorpay_payment_id, razorpay_signature):
+            # Check if this is a "Pay Now" conversion from COD
+            was_cod_order = payment.method == 'cod'
+            original_order_status = payment.order.status
+            
+            # Update payment details
             payment.transaction_id = razorpay_payment_id
             payment.status = 'completed'
             payment.paid_at = timezone.now()
+            
+            # If it was COD, update method to online
+            if was_cod_order:
+                payment.method = 'online'
+                print(f"[INFO] Converting COD order #{payment.order.order_number} payment to online")
+            
             payment.save()
             
             # Update order status to confirmed after successful payment
-            payment.order.status = 'confirmed'
-            payment.order.save()
+            # Only if order was pending (new order), not if already confirmed/preparing
+            if payment.order.status == 'pending':
+                payment.order.status = 'confirmed'
+                payment.order.save()
             
             
             # Clear cart after successful online payment
@@ -195,37 +208,45 @@ class VerifyRazorpayPaymentAPIView(APIView):
             except Cart.DoesNotExist:
                 pass  # Cart already cleared or doesn't exist
             
-            # Send push notifications to branch staff after successful payment
-            try:
-                from users.fcm_service import send_new_order_notification
-                from users.models import User
-                
-                order = payment.order
-                branch = order.branch
-                
-                if branch:
-                    # Get all active staff members assigned to this branch with FCM tokens
-                    branch_staff = User.objects.filter(
-                        assigned_branch=branch,
-                        is_staff=True,
-                        is_active=True,
-                        fcm_token__isnull=False
-                    ).exclude(fcm_token='')
+            # Send push notifications to branch staff ONLY for NEW online payment orders
+            # Do NOT send notification if this is a "Pay Now" conversion from COD
+            # (Staff already received notification when COD order was created)
+            if not was_cod_order and original_order_status == 'pending':
+                try:
+                    from users.fcm_service import send_new_order_notification
+                    from users.models import User
                     
-                    # Send notification to each staff member
-                    notification_count = 0
-                    for staff_member in branch_staff:
-                        if send_new_order_notification(staff_member.fcm_token, order):
-                            notification_count += 1
+                    order = payment.order
+                    branch = order.branch
                     
-                    if notification_count > 0:
-                        print(f"[SUCCESS] Sent notifications to {notification_count} staff members for online payment order #{order.order_number}")
-                    else:
-                        print(f"[WARNING] No staff notifications sent for order #{order.order_number}")
+                    if branch:
+                        # Get all active staff members assigned to this branch with FCM tokens
+                        branch_staff = User.objects.filter(
+                            assigned_branch=branch,
+                            is_staff=True,
+                            is_active=True,
+                            fcm_token__isnull=False
+                        ).exclude(fcm_token='')
                         
-            except Exception as e:
-                # Don't fail the payment verification if notification fails
-                print(f"[ERROR] Failed to send notifications: {str(e)}")
+                        # Send notification to each staff member
+                        notification_count = 0
+                        for staff_member in branch_staff:
+                            if send_new_order_notification(staff_member.fcm_token, order):
+                                notification_count += 1
+                        
+                        if notification_count > 0:
+                            print(f"[SUCCESS] Sent notifications to {notification_count} staff members for NEW online payment order #{order.order_number}")
+                        else:
+                            print(f"[WARNING] No staff notifications sent for order #{order.order_number}")
+                            
+                except Exception as e:
+                    # Don't fail the payment verification if notification fails
+                    print(f"[ERROR] Failed to send notifications: {str(e)}")
+            else:
+                if was_cod_order:
+                    print(f"[INFO] Skipping notification for Pay Now conversion - order #{payment.order.order_number} already known to staff")
+                else:
+                    print(f"[INFO] Skipping notification - order #{payment.order.order_number} status is {original_order_status}, not a new order")
 
             return Response(
                 {
