@@ -5,7 +5,15 @@ from django.db.models import Count, Q, Sum
 from django.utils import timezone
 from datetime import timedelta
 
+# REST Framework imports
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+
 from orders.models import Order
+from products.models import BranchProduct, Juice
+from products.serializers import JuiceSerializer
 from .decorators import staff_required, get_staff_branch_orders
 
 
@@ -179,3 +187,111 @@ def staff_order_detail(request, pk):
     }
     
     return render(request, 'staff/order_detail.html', context)
+
+
+# ========== REST API ENDPOINTS FOR MOBILE APP ==========
+
+class StaffBranchProductsAPIView(APIView):
+    """API endpoint to get all products for staff's branch with availability status"""
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        # Verify user is staff
+        if not request.user.is_staff:
+            return Response(
+                {'error': 'Only staff members can access this endpoint'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Verify staff has assigned branch
+        if not request.user.assigned_branch:
+            return Response(
+                {'error': 'No branch assigned to this staff member'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        branch = request.user.assigned_branch
+        
+        # Get all branch products for this branch
+        branch_products = BranchProduct.objects.filter(
+            branch=branch
+        ).select_related('product', 'product__category').order_by(
+            'product__category__name', 'product__name'
+        )
+        
+        # Format response with product details and availability
+        products_data = []
+        for bp in branch_products:
+            product = bp.product
+            products_data.append({
+                'branch_product_id': bp.id,
+                'product_id': product.id,
+                'name': product.name,
+                'description': product.description,
+                'price': str(product.price),
+                'image': f"https://res.cloudinary.com/dxizjczfh/image/upload/{str(product.image).replace('media/', '', 1)}" if product.image else None,
+                'category': {
+                    'id': product.category.id,
+                    'name': product.category.name
+                } if product.category else None,
+                'is_available': bp.is_available,
+                'is_active': product.is_active,
+                'updated_at': bp.updated_at
+            })
+        
+        return Response({
+            'branch': {
+                'id': branch.id,
+                'name': branch.name,
+                'city': branch.city
+            },
+            'products': products_data,
+            'total_products': len(products_data),
+            'available_products': sum(1 for p in products_data if p['is_available'])
+        }, status=status.HTTP_200_OK)
+
+
+class ToggleBranchProductAvailabilityAPIView(APIView):
+    """API endpoint to toggle product availability at staff's branch"""
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, branch_product_id):
+        # Verify user is staff
+        if not request.user.is_staff:
+            return Response(
+                {'error': 'Only staff members can toggle product availability'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Verify staff has assigned branch
+        if not request.user.assigned_branch:
+            return Response(
+                {'error': 'No branch assigned to this staff member'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        branch = request.user.assigned_branch
+        
+        # Get the branch product (ensure it belongs to staff's branch)
+        try:
+            branch_product = BranchProduct.objects.select_related('product').get(
+                id=branch_product_id,
+                branch=branch
+            )
+        except BranchProduct.DoesNotExist:
+            return Response(
+                {'error': 'Product not found in your branch inventory'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Toggle availability
+        branch_product.is_available = not branch_product.is_available
+        branch_product.save()
+        
+        return Response({
+            'message': f"Product availability updated successfully",
+            'branch_product_id': branch_product.id,
+            'product_name': branch_product.product.name,
+            'is_available': branch_product.is_available,
+            'updated_at': branch_product.updated_at
+        }, status=status.HTTP_200_OK)
