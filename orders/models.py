@@ -168,6 +168,9 @@ class OrderItem(models.Model):
 
     @property
     def subtotal(self):
+        # Handle None values gracefully to prevent crashes
+        if self.price_per_item is None or self.quantity is None:
+            return 0
         return self.price_per_item * self.quantity
 
     def __str__(self):
