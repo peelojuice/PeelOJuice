@@ -13,7 +13,8 @@ class OrderItemInline(admin.TabularInline):
 class OrderAdmin(admin.ModelAdmin):
     list_display = (
         'id', 
-        'user', 
+        'user',
+        'branch',  # Added to show which branch the order belongs to
         'food_subtotal',
         'food_gst_display',
         'delivery_total_display',
@@ -23,7 +24,7 @@ class OrderAdmin(admin.ModelAdmin):
         'created_at'
     )
     list_editable = ('status',)
-    list_filter = ('status', 'created_at')
+    list_filter = ('status', 'branch', 'created_at')
     search_fields = ('user__email', 'user__full_name', 'id')
     readonly_fields = (
         'food_gst', 
@@ -45,7 +46,7 @@ class OrderAdmin(admin.ModelAdmin):
     
     fieldsets = (
         ('Order Info', {
-            'fields': ('user', 'status', 'created_at', 'updated_at')
+            'fields': ('user', 'branch', 'address', 'status', 'created_at', 'updated_at')
         }),
         ('Food Charges (5% GST)', {
             'fields': ('food_subtotal', 'food_gst', 'food_total'),
