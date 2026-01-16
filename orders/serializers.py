@@ -42,12 +42,14 @@ class MyOrderListSerializer(serializers.ModelSerializer):
     total_items = serializers.SerializerMethodField()
     items = OrderItemSerializer(many=True, read_only=True)
     payment_method = serializers.SerializerMethodField()
+    user = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
         fields = (
             'id',
             'order_number',
+            'user',
             'status',
             'total_amount',
             'payment_method',
@@ -58,6 +60,17 @@ class MyOrderListSerializer(serializers.ModelSerializer):
 
     def get_total_items(self, obj):
         return obj.items.count()
+    
+    def get_user(self, obj):
+        """Return user details for staff app"""
+        if obj.user:
+            return {
+                'id': obj.user.id,
+                'email': obj.user.email,
+                'full_name': obj.user.full_name,
+                'phone_number': obj.user.phone_number
+            }
+        return None
     
     def get_payment_method(self, obj):
         if hasattr(obj, 'payment'):
