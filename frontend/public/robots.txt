@@ -1,0 +1,18 @@
+# Allow all search engines to crawl the site
+User-agent: *
+Allow: /
+
+# Disallow crawling of user-specific and checkout pages
+Disallow: /dashboard
+Disallow: /checkout
+Disallow: /my-profile
+Disallow: /my-addresses
+Disallow: /order-detail/*
+Disallow: /order-success
+Disallow: /verify-email
+Disallow: /verify-phone
+Disallow: /forgot-password
+Disallow: /reset-password
+
+# Sitemap location
+Sitemap: https://peel-o-juice.vercel.app/sitemap.xml
