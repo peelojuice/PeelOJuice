@@ -244,17 +244,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 RAZORPAY_KEY_ID = 'rzp_test_Rd8GzuxNiaMOs0'
 RAZORPAY_KEY_SECRET = 's92SezbXevS9JHVa8LcvAV67'
 
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5173',
-    'http://localhost:5174',
-    'http://localhost:5175',
-    'http://127.0.0.1:5173',
-    'http://127.0.0.1:5174',
-    'http://127.0.0.1:5175',
-]
-
-CORS_ALLOW_CREDENTIALS = True
-
 
 # CLOUDINARY CONFIGURATION
 # Get these from your Cloudinary Dashboard:
