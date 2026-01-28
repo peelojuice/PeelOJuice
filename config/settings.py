@@ -168,7 +168,8 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',  # Local development
     'http://127.0.0.1:5173',
     'https://peel-o-juice.vercel.app',  # Vercel production
-    'https://web-production-4a6f1.up.railway.app',  # PeelOJuice Railway backend
+    'https://web-production-53e0c.up.railway.app',  # OLD Railway backend (purna519)
+    'https://web-production-4a6f1.up.railway.app',  # NEW PeelOJuice Railway backend
     'http://localhost',
 ]
 
