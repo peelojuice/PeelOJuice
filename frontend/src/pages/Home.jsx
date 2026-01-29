@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Star, ArrowRight, Zap, Shield, Heart } from 'lucide-react';
+import { Search, Star, ArrowRight, Zap, Shield, Heart, Leaf } from 'lucide-react';
 import api from '../services/api';
 import { useBranch } from '../context/BranchContext';
 import { useCart } from '../context/CartContext';
