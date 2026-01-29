@@ -5,7 +5,7 @@ export default function WhyChooseSection() {
     <section className="py-20 px-4 bg-white">
       <div className="max-w-7xl mx-auto">
         <h2 className="text-4xl md:text-5xl font-bold text-center mb-4 text-gray-900">
-          Why Choose <span className="bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent">PeelOJuice</span>?
+          Why Choose <span className="bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent">Peel'O'Juice</span>?
         </h2>
         <p className="text-center text-gray-600 mb-16 text-lg">Experience the difference with every sip</p>
         

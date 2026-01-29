@@ -19,12 +19,12 @@ export default function HeroBanner() {
             
             <h1 className="text-6xl md:text-7xl font-black leading-tight mb-4">
               <span className="text-gray-900">Get Fresh</span><br/>
-              <span className="bg-gradient-to-r from-red-500 via-orange-500 to-red-600 bg-clip-text text-transparent">PeelOJuice</span><br/>
+              <span className="bg-gradient-to-r from-red-500 via-orange-500 to-red-600 bg-clip-text text-transparent">Peel'O'Juice</span><br/>
               <span className="text-gray-900">Everyday</span>
             </h1>
             
-            <p className="text-gray-700 text-lg mb-6 font-medium">
-              100% Natural • No Preservatives • Made Fresh Daily
+            <p className="text-gray-700 text-lg mb-6 font-medium italic">
+              Sip Fresh.... Feel Refresh
             </p>
             
             <Link
