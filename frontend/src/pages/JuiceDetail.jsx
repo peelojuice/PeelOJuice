@@ -97,12 +97,10 @@ export default function JuiceDetail() {
               )}
               
               {/* Floating Category Badge */}
-              {juice.category && (
-                <div className="absolute top-8 right-8 flex items-center gap-2 bg-white px-4 py-2.5 rounded-2xl shadow-xl border border-[#F0F0F0]">
-                  <Leaf className="w-4 h-4 text-green-500" />
-                  <span className="text-xs font-black text-green-700 uppercase tracking-widest">{juice.category.name}</span>
+                <div className="absolute top-8 right-8 flex items-center gap-2 bg-white px-5 py-2 rounded-2xl shadow-xl border border-[#F0F0F0]">
+                  <Leaf className="w-4 h-4 text-[#6B9E3E]" />
+                  <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{juice.category.name}</span>
                 </div>
-              )}
             </div>
             
             {/* Feature Badges - Desktop */}
@@ -118,7 +116,7 @@ export default function JuiceDetail() {
 
           {/* Right: Info Section */}
           <div className="flex flex-col">
-            <h1 className="text-5xl font-black text-[#1A1A1A] tracking-tighter mb-6 leading-[0.9]">
+            <h1 className="text-5xl font-[800] text-[#1A1A1A] tracking-tighter mb-6 leading-[0.9] uppercase">
               {juice.name}
             </h1>
 
@@ -155,18 +153,18 @@ export default function JuiceDetail() {
             <div className="bg-white p-8 rounded-[32px] border-l-[6px] border-[#FF6B35] shadow-[0_15px_30px_rgba(255,107,53,0.08)] mb-8 border border-[#F0F0F0]">
               <div className="flex justify-between items-start">
                 <div>
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Total Amount</p>
+                  <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest mb-2">Total Amount</p>
                   <div className="flex items-baseline">
-                    <span className="text-2xl font-black text-[#FF6B35]">₹</span>
-                    <span className="text-6xl font-black text-[#FF6B35] ml-1 tracking-tighter">
+                    <span className="text-2xl font-[900] text-[#FF6B35]">₹</span>
+                    <span className="text-6xl font-[900] text-[#FF6B35] ml-1 tracking-tighter">
                       {(juice.price * quantity).toFixed(0)}
                     </span>
                   </div>
-                  <p className="text-xs font-bold text-gray-400 mt-2 tracking-tight">Inclusive of all local taxes</p>
+                  <p className="text-[10px] font-bold text-gray-300 mt-2 tracking-tight uppercase">Inclusive of all local taxes</p>
                 </div>
-                <div className="flex items-center gap-2 bg-[#E8F5E9] px-4 py-2 rounded-xl">
-                  <Star className="w-4 h-4 text-[#2E7D32]" fill="#2E7D32" />
-                  <span className="text-xs font-black text-[#2E7D32] uppercase tracking-tighter">Premium Selection</span>
+                <div className="flex items-center gap-2 bg-[#FFF9F0] px-4 py-2 rounded-xl border border-[#FF6B35]/10">
+                  <Star className="w-4 h-4 text-[#FF6B35]" fill="#FF6B35" />
+                  <span className="text-[10px] font-black text-[#FF6B35] uppercase tracking-tighter">Premium Selection</span>
                 </div>
               </div>
             </div>

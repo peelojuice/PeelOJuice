@@ -3,9 +3,12 @@
 @tailwind utilities;
 
 :root {
-  --primary: #8B5CF6;
-  --secondary: #F97316;
-  --accent: #10B981;
+  --primary: #FF6B35;
+  --brand-purple: #4A1E6D;
+  --brand-green: #6B9E3E;
+  --brand-orange: #FF6B35;
+  --text-dark: #1A1A1A;
+  --bg-muted: #F9F9F9;
 }
 
 @layer base {

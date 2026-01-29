@@ -4,10 +4,10 @@ export default function CategoryFilter({ categories, selectedCategory, onSelectC
       <div className="flex px-6 space-x-3 min-w-max">
         <button
           onClick={() => onSelectCategory('all')}
-          className={`px-8 py-3 rounded-[18px] font-extrabold text-sm transition-all duration-300 whitespace-nowrap tracking-tight ${
+          className={`px-6 py-2.5 rounded-full font-black text-[10px] uppercase tracking-widest transition-all duration-300 whitespace-nowrap ${
             selectedCategory === 'all'
-              ? 'bg-[#1A1A1A] text-white shadow-lg transform scale-105'
-              : 'bg-white text-gray-500 hover:bg-gray-50 border-2 border-[#F0F0F0]'
+              ? 'bg-[#FF6B35] text-white shadow-[0_8px_20px_rgba(255,107,53,0.3)]'
+              : 'bg-white text-gray-400 border border-[#F0F0F0] hover:border-[#FF6B35]/30'
           }`}
         >
           All Juices
@@ -16,10 +16,10 @@ export default function CategoryFilter({ categories, selectedCategory, onSelectC
           <button
             key={category.id}
             onClick={() => onSelectCategory(category.id)}
-            className={`px-8 py-3 rounded-[18px] font-extrabold text-sm transition-all duration-300 whitespace-nowrap tracking-tight ${
+            className={`px-6 py-2.5 rounded-full font-black text-[10px] uppercase tracking-widest transition-all duration-300 whitespace-nowrap ${
               selectedCategory === category.id
-                ? 'bg-[#1A1A1A] text-white shadow-lg transform scale-105'
-                : 'bg-white text-gray-500 hover:bg-gray-50 border-2 border-[#F0F0F0]'
+                ? 'bg-[#FF6B35] text-white shadow-[0_8px_20px_rgba(255,107,53,0.3)]'
+                : 'bg-white text-gray-400 border border-[#F0F0F0] hover:border-[#FF6B35]/30'
             }`}
           >
             {category.name}

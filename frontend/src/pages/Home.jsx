@@ -62,18 +62,18 @@ export default function Home() {
       <div className="relative overflow-hidden bg-white pt-16 pb-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center max-w-4xl mx-auto">
-            <div className="inline-flex items-center gap-2 bg-[#FFF9F0] px-4 py-2 rounded-2xl mb-6 shadow-sm border border-[#F0F0F0]">
+            <div className="inline-flex items-center gap-2 bg-[#FFF9F0] px-4 py-2 rounded-2xl mb-6 border border-[#FF6B35]/10">
               <Star className="w-4 h-4 text-[#FF6B35]" fill="#FF6B35" />
               <span className="text-[10px] font-black text-[#FF6B35] uppercase tracking-[0.2em]">Premium Quality Guaranteed</span>
             </div>
             
-            <h1 className="text-6xl md:text-8xl font-black text-[#1A1A1A] tracking-tighter mb-8 leading-[0.85] uppercase">
-              Fresh Pressed <br />
-              <span className="text-[#FF6B35]">Wellness.</span>
+            <h1 className="text-6xl md:text-8xl font-black tracking-tighter mb-8 leading-[0.85] uppercase">
+              <span className="text-[#4A1E6D]">Fresh</span> <span className="text-[#FF6B35]">Pressed</span> <br />
+              <span className="text-[#6B9E3E]">Wellness.</span>
             </h1>
             
-            <p className="text-gray-400 font-bold text-lg md:text-xl uppercase tracking-widest mb-12 max-w-2xl mx-auto">
-              Sip Fresh... Feel Refresh. Crafted with 100% natural ingredients.
+            <p className="text-gray-400 font-bold text-lg md:text-xl uppercase tracking-[0.2em] mb-12 max-w-2xl mx-auto">
+              Sip Fresh.... Feel Refresh.
             </p>
 
             {/* Premium Search Bar */}
@@ -104,17 +104,17 @@ export default function Home() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-center justify-between mb-12">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-[#1A1A1A] rounded-2xl flex items-center justify-center">
-              <Zap className="w-6 h-6 text-yellow-400" fill="currentColor" />
+            <div className="w-12 h-12 bg-white border-2 border-[#F0F0F0] rounded-2xl flex items-center justify-center shadow-sm">
+              <Zap className="w-6 h-6 text-[#FF6B35]" fill="currentColor" />
             </div>
             <div>
-              <h2 className="text-3xl font-black text-[#1A1A1A] tracking-tighter uppercase">Top Picks</h2>
-              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Customer Favorites</p>
+              <h2 className="text-3xl font-[800] text-[#1A1A1A] tracking-tighter uppercase">Top Picks</h2>
+              <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest mt-0.5">Customer Favorites</p>
             </div>
           </div>
           <button 
             onClick={() => navigate('/menu')}
-            className="group flex items-center gap-2 text-[#FF6B35] font-black uppercase tracking-widest text-xs"
+            className="group flex items-center gap-2 text-[#FF6B35] font-black uppercase tracking-widest text-[10px]"
           >
             View Full Menu
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -146,30 +146,30 @@ export default function Home() {
 
         {/* Feature Highlights */}
         <div className="grid md:grid-cols-3 gap-8 mt-10">
-          <div className="bg-[#FFF9F0] p-10 rounded-[40px] border border-[#FEEBC8] group hover:scale-[1.02] transition-transform duration-500">
+          <div className="bg-[#F4FFF0] p-10 rounded-[40px] border border-[#D1F0C4] group hover:scale-[1.02] transition-transform duration-500">
             <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-md mb-8">
-              <Leaf className="w-7 h-7 text-[#FF6B35]" />
+              <Leaf className="w-7 h-7 text-[#6B9E3E]" />
             </div>
-            <h3 className="text-2xl font-black text-[#1A1A1A] tracking-tighter uppercase mb-4">100% Organic</h3>
-            <p className="text-gray-500 font-bold text-sm uppercase tracking-wider leading-relaxed">
+            <h3 className="text-2xl font-[800] text-[#1A1A1A] tracking-tighter uppercase mb-4">100% Organic</h3>
+            <p className="text-gray-400 font-bold text-xs uppercase tracking-[0.2em] leading-relaxed">
               Never processed. Never pasteurized. Straight from nature to your bottle.
             </p>
           </div>
-          <div className="bg-[#F0FFF4] p-10 rounded-[40px] border border-[#C6F6D5] group hover:scale-[1.02] transition-transform duration-500">
+          <div className="bg-[#F5F3FF] p-10 rounded-[40px] border border-[#DDD6FE] group hover:scale-[1.02] transition-transform duration-500">
             <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-md mb-8">
-              <Shield className="w-7 h-7 text-green-600" />
+              <Shield className="w-7 h-7 text-[#4A1E6D]" />
             </div>
-            <h3 className="text-2xl font-black text-[#1A1A1A] tracking-tighter uppercase mb-4">Pure Quality</h3>
-            <p className="text-gray-500 font-bold text-sm uppercase tracking-wider leading-relaxed">
+            <h3 className="text-2xl font-[800] text-[#1A1A1A] tracking-tighter uppercase mb-4">Pure Quality</h3>
+            <p className="text-gray-400 font-bold text-xs uppercase tracking-[0.2em] leading-relaxed">
               No added sugars, preservatives, or artificial flavors. Just pure juice.
             </p>
           </div>
-          <div className="bg-[#FFF5F8] p-10 rounded-[40px] border border-[#FED7E2] group hover:scale-[1.02] transition-transform duration-500">
+          <div className="bg-[#FFF9F0] p-10 rounded-[40px] border border-[#FED7E2] group hover:scale-[1.02] transition-transform duration-500">
             <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-md mb-8">
-              <Heart className="w-7 h-7 text-pink-500" />
+              <Heart className="w-7 h-7 text-[#FF6B35]" />
             </div>
-            <h3 className="text-2xl font-black text-[#1A1A1A] tracking-tighter uppercase mb-4">Made with Love</h3>
-            <p className="text-gray-500 font-bold text-sm uppercase tracking-wider leading-relaxed">
+            <h3 className="text-2xl font-[800] text-[#1A1A1A] tracking-tighter uppercase mb-4">Made with Love</h3>
+            <p className="text-gray-400 font-bold text-xs uppercase tracking-[0.2em] leading-relaxed">
               Hand-crafted daily to ensure you get the maximum nutrients and taste.
             </p>
           </div>

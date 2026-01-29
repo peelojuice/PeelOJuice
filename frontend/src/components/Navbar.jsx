@@ -16,27 +16,32 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 bg-[#FF6B35] rounded-xl flex items-center justify-center shadow-lg transform group-hover:rotate-12 transition-transform">
-               <Star className="w-6 h-6 text-white" fill="currentColor" />
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="w-12 h-12 bg-[#FF6B35] rounded-2xl flex items-center justify-center shadow-[0_8px_30px_rgba(255,107,53,0.3)] transform group-hover:rotate-12 transition-transform">
+               <Star className="w-7 h-7 text-white" fill="currentColor" />
             </div>
-            <span className="text-2xl font-black tracking-tighter uppercase text-[#1A1A1A]">
-              Peel<span className="text-[#FF6B35]">'O'</span>Juice
-            </span>
+            <div className="flex flex-col">
+              <div className="flex items-center">
+                <span className="text-2xl font-black tracking-tighter uppercase text-[#4A1E6D]">Peel</span>
+                <span className="text-2xl font-black tracking-tighter uppercase text-[#FF6B35] px-0.5">'O'</span>
+                <span className="text-2xl font-black tracking-tighter uppercase text-[#6B9E3E]">Juice</span>
+              </div>
+              <span className="text-[8px] font-black text-gray-400 uppercase tracking-[0.2em] leading-none mt-1">Sip Fresh.... Feel Refresh</span>
+            </div>
           </Link>
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-10">
-            <Link to="/" className="text-[10px] font-black text-gray-400 hover:text-[#FF6B35] uppercase tracking-[0.2em] transition-colors">Home</Link>
-            <Link to="/menu" className="text-[10px] font-black text-gray-400 hover:text-[#FF6B35] uppercase tracking-[0.2em] transition-colors">Menu</Link>
+            <Link to="/" className="text-[10px] font-[800] text-gray-400 hover:text-[#FF6B35] uppercase tracking-[0.2em] transition-colors">Home</Link>
+            <Link to="/menu" className="text-[10px] font-[800] text-gray-400 hover:text-[#FF6B35] uppercase tracking-[0.2em] transition-colors">Menu</Link>
             
             <Link to="/cart" className="relative group">
-              <div className="flex items-center gap-2 text-[10px] font-black text-gray-400 group-hover:text-[#FF6B35] uppercase tracking-[0.2em] transition-colors">
+              <div className="flex items-center gap-2 text-[10px] font-[800] text-gray-400 group-hover:text-[#FF6B35] uppercase tracking-[0.2em] transition-colors">
                 <ShoppingCart className="w-5 h-5 group-hover:scale-110 transition-transform" />
                 Cart
               </div>
               {cartCount > 0 && (
-                <span className="absolute -top-2.5 -right-2.5 bg-[#FF6B35] text-white text-[9px] font-black rounded-lg w-5 h-5 flex items-center justify-center shadow-lg border-2 border-white">
+                <span className="absolute -top-2.5 -right-2.5 bg-[#FF6B35] text-white text-[9px] font-[900] rounded-lg w-5 h-5 flex items-center justify-center shadow-lg border-2 border-white">
                   {cartCount}
                 </span>
               )}
