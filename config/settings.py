@@ -30,7 +30,15 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-7$w1&@58-j4hx3cu8znb1
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv())
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    'web-production-53e0c.up.railway.app',  # OLD Railway backend
+    'web-production-4a6f1.up.railway.app',  # NEW Railway backend
+    '.up.railway.app',  # Wildcard for all Railway domains
+    '.vercel.app',  # Wildcard for all Vercel domains
+    'peel-o-juice.vercel.app',
+]
 
 # CSRF trusted origins for Railway and Vercel
 CSRF_TRUSTED_ORIGINS = [
