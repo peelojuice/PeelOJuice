@@ -19,8 +19,8 @@ export default function Navbar() {
           <Link to="/" className="flex items-center">
             <span className="text-2xl font-bold">
               <span className="text-[#F5A623]">Peel</span>
-              <span className="text-[#FF6B35]">O</span>
-              <span className="text-[#2D5016]">JUICE</span>
+              <span className="text-[#FF6B35]">'O'</span>
+              <span className="text-[#2D5016]">Juice</span>
             </span>
           </Link>
 
