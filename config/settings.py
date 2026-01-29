@@ -43,6 +43,7 @@ ALLOWED_HOSTS = [
 # CSRF trusted origins for Railway and Vercel
 CSRF_TRUSTED_ORIGINS = [
     'https://web-production-53e0c.up.railway.app',
+    'https://web-production-4a6f1.up.railway.app',
     'https://*.up.railway.app',
     'https://peel-o-juice.vercel.app',  # Vercel frontend
     'https://*.vercel.app',
