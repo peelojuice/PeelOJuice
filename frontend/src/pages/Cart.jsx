@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ShoppingBag } from 'lucide-react';
+import { ShoppingBag, ArrowLeft, MapPin, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
@@ -27,7 +27,6 @@ export default function Cart() {
       const response = await addressAPI.getAddresses();
       setAddresses(response.data);
     } catch (error) {
-      // User might not be logged in or no addresses
       setAddresses([]);
     } finally {
       setAddressesLoading(false);
@@ -81,28 +80,29 @@ export default function Cart() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="text-2xl font-semibold text-primary">Loading...</div>
+      <div className="flex flex-col justify-center items-center min-h-screen bg-white gap-4">
+        <div className="w-12 h-12 border-4 border-[#FF6B35] border-t-transparent rounded-full animate-spin"></div>
+        <div className="text-lg font-black text-[#1A1A1A] tracking-tighter uppercase">Processing Cart...</div>
       </div>
     );
   }
 
   if (!cart || cart.items.length === 0) {
     return (
-      <div className="min-h-screen bg-[#F5F2ED] flex items-center justify-center px-4">
-        <div className="max-w-md w-full bg-white rounded-2xl shadow-sm p-12 text-center">
-          <div className="w-20 h-20 bg-[#8BA888]/10 rounded-full flex items-center justify-center mx-auto mb-6">
-            <ShoppingBag className="w-10 h-10 text-[#8BA888]" />
+      <div className="min-h-screen bg-white flex items-center justify-center px-6">
+        <div className="max-w-md w-full text-center">
+          <div className="w-32 h-32 bg-[#F9F9F9] rounded-[40px] flex items-center justify-center mx-auto mb-8 border border-[#F0F0F0] shadow-sm">
+            <ShoppingBag className="w-12 h-12 text-[#FF6B35] opacity-20" />
           </div>
-          <h2 className="text-2xl font-semibold text-gray-800 mb-3">Your Cart is Empty</h2>
-          <p className="text-gray-600 mb-8">
-            Add some delicious juices to get started!
+          <h2 className="text-3xl font-black text-[#1A1A1A] tracking-tighter uppercase mb-2">Cart is empty</h2>
+          <p className="text-gray-400 font-bold text-xs uppercase tracking-widest mb-10">
+            Time to fill your bag with some wellness!
           </p>
           <button
             onClick={() => navigate('/menu')}
-            className="w-full bg-[#8BA888] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#7a9677] transition shadow-md"
+            className="w-full bg-[#1A1A1A] text-white px-8 py-5 rounded-[24px] font-black uppercase tracking-[0.2em] text-xs hover:bg-black transition-all shadow-xl active:scale-95"
           >
-            Browse Menu
+            Explore Full Menu
           </button>
         </div>
       </div>
@@ -110,75 +110,76 @@ export default function Cart() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Shopping Cart</h1>
-      
-      <div className="grid lg:grid-cols-3 gap-6">
-        {/* Cart Items */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Products Table */}
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            <table className="w-full">
-              <thead className="bg-black text-white">
-                <tr>
-                  <th className="p-4 text-left">Product</th>
-                  <th className="p-4 text-center">Quantity</th>
-                  <th className="p-4 text-right">Subtotal</th>
-                  <th className="p-4 text-center">Remove</th>
-                </tr>
-              </thead>
-              <tbody>
-                {cart.items.map((item) => (
-                  <CartItem
-                    key={item.id}
-                    item={item}
-                    onUpdateQuantity={handleUpdateQuantity}
-                    onRemove={handleRemoveItem}
-                  />
-                ))}
-              </tbody>
-            </table>
+    <div className="bg-white min-h-screen pb-24">
+      <div className="max-w-7xl mx-auto px-6 py-10">
+        <div className="flex items-center gap-4 mb-10">
+          <button 
+            onClick={() => navigate('/menu')}
+            className="w-12 h-12 bg-[#F9F9F9] rounded-2xl flex items-center justify-center border border-[#F0F0F0] hover:bg-white transition-colors group"
+          >
+            <ArrowLeft className="w-5 h-5 text-[#1A1A1A] group-hover:-translate-x-1 transition-transform" />
+          </button>
+          <div>
+            <h1 className="text-3xl font-black text-[#1A1A1A] tracking-tighter uppercase">Checkout Bag</h1>
+            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{cart.items.length} Items Selected</p>
           </div>
-
-          {/* Coupon Section */}
-          <CouponSection
-            appliedCoupon={cart.applied_coupon}
-            onApplyCoupon={handleApplyCoupon}
-            onRemoveCoupon={handleRemoveCoupon}
-            isApplying={applyingCoupon}
-          />
-
-          {/* Address Validation Section */}
-          {!addressesLoading && addresses.length === 0 && (
-            <div className="bg-yellow-50 border-2 border-yellow-400 rounded-xl p-6">
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0">
-                  <svg className="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                  </svg>
+        </div>
+        
+        <div className="grid lg:grid-cols-[1fr_400px] gap-12 items-start">
+          {/* Left Column: Items & Options */}
+          <div className="space-y-8">
+            {/* Address Warning */}
+            {!addressesLoading && addresses.length === 0 && (
+              <div className="bg-[#FFF9E5] border border-[#FFE082] rounded-[32px] p-8 flex items-start gap-6 shadow-sm">
+                <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-[#F57C00] shadow-sm flex-shrink-0">
+                  <MapPin className="w-7 h-7" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-lg font-bold text-yellow-800 mb-2">
-                    No Delivery Address Found
-                  </h3>
-                  <p className="text-yellow-700 mb-4">
-                    Please add a delivery address before proceeding to checkout. We need to know where to deliver your delicious juices!
+                  <h3 className="text-lg font-black text-[#1A1A1A] tracking-tight mb-2 uppercase">No Delivery Address</h3>
+                  <p className="text-gray-500 font-medium text-sm leading-relaxed mb-6">
+                    Please provide your delivery details so we can bring your fresh items to your doorstep!
                   </p>
                   <button
                     onClick={() => navigate('/my-addresses')}
-                    className="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-2 rounded-lg font-semibold transition"
+                    className="bg-white border-2 border-[#1A1A1A] text-[#1A1A1A] px-6 py-3 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-[#1A1A1A] hover:text-white transition-all active:scale-95"
                   >
-                    Add Delivery Address
+                    Set Delivery Address
                   </button>
                 </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
 
-        {/* Cart Summary */}
-        <div>
-          <CartSummary cart={cart} hasAddresses={addresses.length > 0} />
+            {/* Cart Items List */}
+            <div className="space-y-4">
+               {cart.items.map((item) => (
+                <CartItem
+                  key={item.id}
+                  item={item}
+                  onUpdateQuantity={handleUpdateQuantity}
+                  onRemove={handleRemoveItem}
+                />
+              ))}
+            </div>
+
+            {/* Coupon Section */}
+            <CouponSection
+              appliedCoupon={cart.applied_coupon}
+              onApplyCoupon={handleApplyCoupon}
+              onRemoveCoupon={handleRemoveCoupon}
+              isApplying={applyingCoupon}
+            />
+          </div>
+
+          {/* Right Column: Summary */}
+          <div className="lg:sticky lg:top-8">
+            <CartSummary cart={cart} hasAddresses={addresses.length > 0} />
+            <div className="mt-6 flex items-center gap-3 px-4 py-3 bg-[#F9F9F9] rounded-2xl border border-[#F0F0F0]">
+              <AlertCircle className="w-4 h-4 text-gray-300" />
+              <p className="text-[9px] font-bold text-gray-400 uppercase tracking-tight leading-snug">
+                Items are fresh and perishable. Please ensure someone is available for delivery.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

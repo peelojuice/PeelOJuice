@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Phone, Hash, Leaf } from 'lucide-react';
+import { Phone, Zap, Star } from 'lucide-react';
 import api from '../services/api';
 import { useToast } from '../context/ToastContext';
 
@@ -15,7 +15,6 @@ export default function VerifyPhone() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
     try {
       await api.post('/users/verify-phone/', { phone_number: phone, otp });
       showToast('Phone verified successfully!', 'success');
@@ -28,64 +27,67 @@ export default function VerifyPhone() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F2ED] flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
-        {/* Branding */}
-        <div className="text-center mb-8">
-          <div className="mb-2">
-            <div className="text-4xl font-bold">
-              <span className="text-[#F5A623]">Peel</span>
-              <span className="text-[#FF6B35]">O</span>
-              <span className="text-gray-800">JUICE</span>
-            </div>
-          </div>
-          <p className="text-sm text-gray-500">Verify Your Phone</p>
+    <div className="min-h-screen bg-white flex items-center justify-center px-6 py-12">
+      <div className="w-full max-w-[480px]">
+        {/* Logo Section */}
+        <div className="text-center mb-12">
+           <div className="inline-flex items-center gap-4 mb-6 group cursor-pointer" onClick={() => navigate('/')}>
+             <div className="w-16 h-16 bg-[#FF6B35] rounded-3xl flex items-center justify-center shadow-2xl transform transition-transform group-hover:rotate-12">
+                <Star className="w-10 h-10 text-white" fill="currentColor" />
+             </div>
+             <div className="text-left">
+                <h1 className="text-3xl font-black text-[#1A1A1A] tracking-tighter uppercase leading-none">
+                  Peel<span className="text-[#FF6B35]">O</span>Juice
+                </h1>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mt-1">Nature's purest energy</p>
+             </div>
+           </div>
         </div>
 
-        {/* Verify Card */}
-        <div className="bg-white rounded-2xl shadow-sm p-8">
-          <div className="text-center mb-6">
-            <div className="w-16 h-16 bg-[#8BA888]/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Phone className="w-8 h-8 text-[#8BA888]" />
+        <div className="bg-white rounded-[40px] border border-[#F0F0F0] p-10 shadow-[0_30px_70px_rgba(0,0,0,0.05)]">
+          <div className="text-center mb-10">
+            <div className="w-20 h-20 bg-[#F9F9F9] border border-[#F0F0F0] rounded-[30px] flex items-center justify-center mx-auto mb-6 text-[#FF6B35]">
+              <Phone className="w-10 h-10" />
             </div>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-2">Check Your Phone</h2>
-            <p className="text-gray-600 text-sm">
-              We've sent a verification code to<br />
-              <span className="font-semibold text-gray-800">{phone}</span>
+            <h2 className="text-2xl font-black text-[#1A1A1A] tracking-tighter uppercase mb-2">Check Your Device</h2>
+            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-relaxed">
+              We've dispatched a secure code to<br />
+              <span className="text-[#1A1A1A] font-black">{phone}</span>
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* OTP Input */}
+          <form onSubmit={handleSubmit} className="space-y-8">
             <div>
-              <label className="block text-sm text-gray-600 mb-2">Enter Code</label>
+              <label className="block text-[8px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3 ml-1 text-center">Enter 6-Digit Gateway Code</label>
               <input
                 type="text"
-                placeholder="000000"
+                placeholder="000 000"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value)}
                 maxLength={6}
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-[#8BA888] focus:ring-1 focus:ring-[#8BA888] transition text-gray-700 text-center text-xl tracking-widest font-semibold"
+                className="w-full px-6 py-5 bg-[#F9F9F9] border-2 border-[#F0F0F0] rounded-[24px] text-3xl font-black text-[#1A1A1A] focus:bg-white focus:border-[#FF6B35] focus:outline-none transition-all text-center tracking-[0.5em] placeholder:text-gray-200"
                 required
               />
             </div>
 
-            {/* Verify Button */}
             <button
               type="submit"
               disabled={loading || otp.length !== 6}
-              className="w-full bg-[#8BA888] text-white font-medium py-3 rounded-lg hover:bg-[#7a9677] transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-[#1A1A1A] text-white py-6 rounded-[24px] font-black uppercase tracking-[0.2em] text-[10px] hover:bg-black transition-all shadow-xl active:scale-95 disabled:opacity-30 disabled:scale-100 flex items-center justify-center gap-3"
             >
-              {loading ? 'Verifying...' : 'Verify Phone'}
+              {loading ? (
+                <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+              ) : (
+                <>Scale Access <Zap className="w-4 h-4 text-[#FF6B35]" fill="currentColor" /></>
+              )}
             </button>
 
-            {/* Resend Link */}
             <div className="text-center">
               <button
                 type="button"
-                className="text-gray-600 hover:text-gray-800 font-medium text-sm underline"
+                className="text-[9px] font-black text-[#FF6B35] uppercase tracking-widest hover:underline"
               >
-                Didn't receive code? Resend
+                Request Fresh Dispatch
               </button>
             </div>
           </form>

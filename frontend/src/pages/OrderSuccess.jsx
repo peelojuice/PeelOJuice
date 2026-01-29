@@ -1,126 +1,116 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { CheckCircle, Package, CreditCard, Clock } from 'lucide-react';
+import { CheckCircle, Package, CreditCard, Clock, Star, Zap, ShoppingBag } from 'lucide-react';
 
 export default function OrderSuccess() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [orderDetails, setOrderDetails] = useState({
+  const [orderDetails] = useState({
     orderId: searchParams.get('orderId'),
     method: searchParams.get('method'),
     success: searchParams.get('success') === 'true'
   });
 
   useEffect(() => {
-    // If not successful, redirect to orders page
     if (!orderDetails.success) {
-      setTimeout(() => navigate('/orders'), 2000);
+      const timer = setTimeout(() => navigate('/orders'), 2000);
+      return () => clearTimeout(timer);
     }
   }, [orderDetails.success, navigate]);
 
   if (!orderDetails.success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 to-orange-50">
-        <div className="bg-white rounded-3xl shadow-2xl p-12 max-w-md text-center">
-          <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg className="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+      <div className="min-h-screen flex items-center justify-center bg-white px-6">
+        <div className="bg-white rounded-[40px] border border-[#F0F0F0] p-12 max-w-md w-full text-center shadow-2xl animate-in fade-in slide-in-from-top-4">
+          <div className="w-24 h-24 bg-[#FFF5F8] border border-[#FED7E2] rounded-[30px] flex items-center justify-center mx-auto mb-8 text-red-500">
+             <div className="w-12 h-12 border-4 border-red-500 rounded-full flex items-center justify-center font-black text-2xl">!</div>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-3">Payment Failed</h1>
-          <p className="text-gray-600 mb-6">Something went wrong with your payment. Redirecting...</p>
+          <h1 className="text-3xl font-black text-[#1A1A1A] tracking-tighter uppercase mb-4 leading-none">Entry Denied</h1>
+          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-relaxed mb-8">Security check failed or payment was interrupted. Redirecting to your command center...</p>
         </div>
       </div>
     );
   }
 
-  const paymentMethodDisplay = orderDetails.method === 'cod' ? 'Cash on Delivery' : 'Online Payment';
+  const paymentMethodDisplay = orderDetails.method === 'cod' ? 'Cash Collective' : 'Digital Transfer';
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 py-12 px-4">
-      <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden">
-        {/* Success Animation */}
-        <div className="bg-gradient-to-r from-green-400 to-emerald-500 p-8 text-center">
-          <div className="inline-block">
-            <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
-              <CheckCircle className="w-16 h-16 text-green-500" strokeWidth={3} />
-            </div>
+    <div className="min-h-screen bg-white flex items-center justify-center px-6 py-12">
+      <div className="max-w-2xl w-full">
+        {/* Success Header */}
+        <div className="text-center mb-16 relative">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-[#FF6B35]/5 rounded-full blur-3xl -z-10 animate-pulse"></div>
+          <div className="inline-flex items-center justify-center w-28 h-28 bg-[#FF6B35] rounded-[36px] shadow-2xl shadow-[#FF6B35]/40 mb-10 transform scale-110 rotate-3">
+             <Star className="w-14 h-14 text-white" fill="currentColor" />
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">
-            Order Placed Successfully!
-          </h1>
-          <p className="text-2xl">🎉</p>
+          <h1 className="text-5xl font-black text-[#1A1A1A] tracking-tighter uppercase mb-2 leading-none">Mission Success</h1>
+          <p className="text-[10px] font-black text-[#FF6B35] uppercase tracking-[0.4em]">Energy Is On Its Way</p>
         </div>
 
-        {/* Content */}
-        <div className="p-8">
-          <p className="text-center text-gray-600 mb-8 text-lg">
-            Thank you for your order. We've received your request and it's being processed.
-          </p>
+        {/* Order Intel Card */}
+        <div className="bg-white rounded-[48px] border-2 border-[#1A1A1A] p-10 md:p-14 shadow-[0_40px_100px_rgba(0,0,0,0.1)] relative overflow-hidden mb-12">
+           <div className="absolute top-0 right-0 w-32 h-32 bg-[#FF6B35]/5 rounded-bl-[100px]"></div>
+           
+           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-12 border-b border-[#F0F0F0] pb-10">
+              <div>
+                <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest mb-1">Authorization ID</p>
+                <h2 className="text-3xl font-black text-[#1A1A1A] tracking-tighter">#{orderDetails.orderId}</h2>
+              </div>
+              <div className="flex flex-col items-end">
+                <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest mb-2">Operational Status</p>
+                <span className="px-6 py-2 bg-[#1A1A1A] text-white rounded-full text-[10px] font-black uppercase tracking-[0.2em]">Confirmed</span>
+              </div>
+           </div>
 
-          {/* Order Details Card */}
-          <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 mb-8">
-            <div className="flex items-center gap-2 mb-4">
-              <Package className="w-6 h-6 text-purple-600" />
-              <h2 className="text-xl font-bold text-gray-900">Order Details</h2>
-            </div>
-            
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600 font-medium">Order Number:</span>
-                <span className="text-gray-900 font-bold text-lg">{orderDetails.orderId}</span>
+           <div className="grid md:grid-cols-2 gap-12">
+              <div className="flex gap-6">
+                 <div className="w-14 h-14 bg-[#F9F9F9] border border-[#F0F0F0] rounded-2xl flex items-center justify-center text-[#FF6B35]">
+                    <CreditCard className="w-6 h-6" />
+                 </div>
+                 <div>
+                    <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest mb-1">Transfer Method</p>
+                    <p className="text-sm font-black text-[#1A1A1A] uppercase tracking-tighter">{paymentMethodDisplay}</p>
+                 </div>
               </div>
-              
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600 font-medium flex items-center gap-2">
-                  <CreditCard className="w-4 h-4" />
-                  Payment:
-                </span>
-                <span className="text-gray-900 font-semibold">{paymentMethodDisplay}</span>
+              <div className="flex gap-6">
+                 <div className="w-14 h-14 bg-[#F9F9F9] border border-[#F0F0F0] rounded-2xl flex items-center justify-center text-[#FF6B35]">
+                    <Clock className="w-6 h-6" />
+                 </div>
+                 <div>
+                    <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest mb-1">Estimated Dispatch</p>
+                    <p className="text-sm font-black text-[#1A1A1A] uppercase tracking-tighter">Under 30 Minutes</p>
+                 </div>
               </div>
-              
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600 font-medium flex items-center gap-2">
-                  <Clock className="w-4 h-4" />
-                  Status:
-                </span>
-                <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-bold">
-                  Confirmed
-                </span>
-              </div>
-            </div>
-          </div>
+           </div>
 
-          {/* Action Buttons */}
-          <div className="space-y-3">
-            <button
+           <div className="mt-14 pt-10 border-t border-[#F0F0F0] flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                 <Zap className="w-5 h-5 text-[#FF6B35]" fill="currentColor" />
+                 <span className="text-[9px] font-black text-[#1A1A1A] uppercase tracking-widest">Priority Processing Active</span>
+              </div>
+              <p className="text-[9px] font-black text-gray-300 uppercase tracking-widest">Licensed Wellness</p>
+           </div>
+        </div>
+
+        {/* Tactical Actions */}
+        <div className="flex flex-col md:flex-row gap-6">
+           <button
               onClick={() => navigate('/orders')}
-              className="w-full bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 text-white py-4 px-6 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-105 flex items-center justify-center gap-2"
-            >
-              <Package className="w-5 h-5" />
-              View My Orders
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-            </button>
-            
-            <button
+              className="flex-1 bg-[#1A1A1A] text-white py-8 rounded-[32px] font-black uppercase tracking-[0.3em] text-[10px] hover:bg-black transition-all shadow-2xl active:scale-95 flex items-center justify-center gap-4"
+           >
+              <Package className="w-5 h-5 text-[#FF6B35]" />
+              Track Intel
+           </button>
+           <button
               onClick={() => navigate('/menu')}
-              className="w-full bg-white border-2 border-gray-300 text-gray-700 py-4 px-6 rounded-xl font-semibold text-lg hover:bg-gray-50 transition-all"
-            >
-              Continue Shopping
-            </button>
-          </div>
-
-          {/* Additional Info */}
-          <div className="mt-6 p-4 bg-blue-50 rounded-xl">
-            <p className="text-sm text-blue-800 text-center">
-              <span className="font-semibold">📧 Confirmation sent!</span>
-              <br />
-              Check your email for order details
-            </p>
-          </div>
+              className="flex-1 bg-white text-[#1A1A1A] border-2 border-[#1A1A1A] py-8 rounded-[32px] font-black uppercase tracking-[0.3em] text-[10px] hover:bg-[#F9F9F9] transition-all active:scale-95 flex items-center justify-center gap-4"
+           >
+              <ShoppingBag className="w-5 h-5 text-[#FF6B35]" />
+              Deploy More
+           </button>
         </div>
+
+        <p className="text-center mt-12 text-[8px] font-black text-gray-300 uppercase tracking-[0.5em]">Electronic confirmation dispatched to your communication channel</p>
       </div>
     </div>
   );

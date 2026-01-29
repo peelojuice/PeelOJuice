@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, MapPin, Edit, Trash2, Star } from 'lucide-react';
+import { Plus, MapPin, Edit, Trash2, Star, Zap, Map } from 'lucide-react';
 import addressAPI from '../services/addressAPI';
 import { useToast } from '../context/ToastContext';
 import AddressForm from '../components/AddressForm';
@@ -49,7 +49,6 @@ export default function MyAddresses() {
 
   const handleDelete = async (id) => {
     if (!confirm('Are you sure you want to delete this address?')) return;
-
     try {
       await addressAPI.deleteAddress(id);
       showToast('Address deleted successfully', 'success');
@@ -81,41 +80,45 @@ export default function MyAddresses() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="text-2xl font-semibold text-primary">Loading...</div>
+      <div className="flex flex-col justify-center items-center min-h-screen bg-white gap-4">
+        <div className="w-12 h-12 border-4 border-[#FF6B35] border-t-transparent rounded-full animate-spin"></div>
+        <div className="text-lg font-black text-[#1A1A1A] tracking-tighter uppercase">Locating your spots...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-6xl mx-auto px-4">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800">My Addresses</h1>
-            <p className="text-gray-600 mt-1">Manage your delivery addresses</p>
+    <div className="min-h-screen bg-white pb-20">
+      <div className="max-w-6xl mx-auto px-6 py-10">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-[#1A1A1A] rounded-2xl flex items-center justify-center shadow-lg">
+              <Map className="w-6 h-6 text-[#FF6B35]" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-black text-[#1A1A1A] tracking-tighter uppercase leading-none">Saved Locations</h1>
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mt-1">Manage where we bring your health</p>
+            </div>
           </div>
           <button
             onClick={() => setShowForm(true)}
-            className="flex items-center gap-2 bg-black text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-800 transition shadow-lg"
+            className="group flex items-center gap-3 bg-[#FF6B35] text-white px-8 py-5 rounded-[24px] font-black uppercase tracking-widest text-[10px] hover:bg-black transition-all shadow-xl active:scale-95"
           >
-            <Plus className="w-5 h-5" />
+            <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform" />
             Add New Address
           </button>
         </div>
 
-        {/* Addresses Grid */}
         {addresses.length === 0 ? (
-          <div className="text-center py-16">
-            <MapPin className="w-24 h-24 mx-auto text-gray-300 mb-4" />
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">No addresses yet</h2>
-            <p className="text-gray-600 mb-6">Add your first delivery address</p>
+          <div className="text-center py-24 bg-[#F9F9F9] rounded-[40px] border border-[#F0F0F0]">
+            <MapPin className="w-20 h-20 mx-auto text-gray-200 mb-6 opacity-20" />
+            <h2 className="text-2xl font-black text-[#1A1A1A] tracking-tighter uppercase mb-2">No addresses yet</h2>
+            <p className="text-gray-400 font-bold text-xs uppercase tracking-widest mb-10">Save your favorite spots for faster checkout</p>
             <button
               onClick={() => setShowForm(true)}
-              className="bg-black text-white px-8 py-3 rounded-lg font-semibold hover:bg-gray-800 transition"
+              className="bg-[#1A1A1A] text-white px-10 py-5 rounded-[24px] font-black uppercase tracking-[0.2em] text-[10px] hover:bg-black transition-all shadow-xl"
             >
-              Add Address
+              Add First Address
             </button>
           </div>
         ) : (
@@ -123,59 +126,54 @@ export default function MyAddresses() {
             {addresses.map((address) => (
               <div
                 key={address.id}
-                className={`bg-white rounded-2xl shadow-md hover:shadow-xl transition-all p-6 relative ${
-                  address.is_default ? 'ring-2 ring-black' : ''
+                className={`bg-white rounded-[32px] border transition-all p-8 relative group ${
+                  address.is_default ? 'border-[#FF6B35] shadow-lg bg-[#FFF9F0]' : 'border-[#F0F0F0] hover:border-[#E0E0E0] hover:shadow-md'
                 }`}
               >
-                {/* Default Badge */}
                 {address.is_default && (
-                  <div className="absolute top-4 right-4 bg-black text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
-                    <Star className="w-3 h-3" />
-                    DEFAULT
+                  <div className="absolute top-8 right-8 bg-[#FF6B35] text-white px-4 py-2 rounded-xl text-[8px] font-black flex items-center gap-2 uppercase tracking-widest">
+                    <Star className="w-3 h-3" fill="currentColor" />
+                    Default
                   </div>
                 )}
 
-                {/* Label */}
-                <div className="mb-4">
-                  <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                    <MapPin className="w-5 h-5 text-black" />
-                    {address.label}
-                  </h3>
+                <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-[#F0F0F0] shadow-sm text-[#FF6B35] mb-6">
+                  <MapPin className="w-6 h-6" />
                 </div>
 
-                {/* Address Details */}
-                <div className="text-gray-600 space-y-1 mb-4">
-                  <p className="font-semibold text-gray-800">{address.full_name}</p>
-                  <p>{address.phone_number}</p>
-                  <p>{address.address_line1}</p>
-                  {address.address_line2 && <p>{address.address_line2}</p>}
-                  <p>{address.city}, {address.state} - {address.pincode}</p>
-                  {address.landmark && <p className="text-sm text-gray-500">Near: {address.landmark}</p>}
+                <h3 className="text-xl font-black text-[#1A1A1A] uppercase tracking-tighter mb-4">{address.label}</h3>
+                
+                <div className="text-gray-500 space-y-2 mb-8">
+                  <p className="text-[10px] font-black text-[#1A1A1A] uppercase tracking-widest">{address.full_name}</p>
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter leading-relaxed">
+                    {address.address_line1}, {address.address_line2 && `${address.address_line2}, `}
+                    {address.city}, {address.state} - {address.pincode}
+                  </p>
+                  <p className="text-[10px] font-black text-[#FF6B35] uppercase tracking-widest">{address.phone_number}</p>
                 </div>
 
-                {/* Actions */}
-                <div className="flex gap-2 pt-4 border-t">
+                <div className="flex gap-2 pt-6 border-t border-[#F0F0F0]">
                   {!address.is_default && (
                     <button
                       onClick={() => handleSetDefault(address.id)}
-                      className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition text-sm"
+                      className="flex-1 px-4 py-3 bg-white text-[#1A1A1A] rounded-xl font-black uppercase tracking-widest text-[8px] hover:bg-[#F9F9F9] border border-[#F0F0F0] transition-all"
                     >
-                      Set Default
+                      Make Default
                     </button>
                   )}
                   <button
                     onClick={() => handleEdit(address)}
-                    className="flex items-center justify-center gap-1 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg font-semibold hover:bg-blue-100 transition text-sm"
+                    className="flex items-center justify-center gap-2 px-4 py-3 bg-[#F9F9F9] text-[#1A1A1A] rounded-xl font-black uppercase tracking-widest text-[8px] hover:bg-white border border-[#F0F0F0] transition-all"
                   >
-                    <Edit className="w-4 h-4" />
+                    <Edit className="w-3 h-3" />
                     Edit
                   </button>
                   <button
                     onClick={() => handleDelete(address.id)}
-                    className="flex items-center justify-center gap-1 px-4 py-2 bg-red-50 text-red-600 rounded-lg font-semibold hover:bg-red-100 transition text-sm"
+                    className="flex items-center justify-center gap-2 px-4 py-3 bg-red-50 text-red-500 rounded-xl font-black uppercase tracking-widest text-[8px] hover:bg-red-100 border border-red-100 transition-all"
                   >
-                    <Trash2 className="w-4 h-4" />
-                    Delete
+                    <Trash2 className="w-3 h-3" />
+                    Trash
                   </button>
                 </div>
               </div>
@@ -183,7 +181,6 @@ export default function MyAddresses() {
           </div>
         )}
 
-        {/* Address Form Modal */}
         {showForm && (
           <AddressForm
             address={editingAddress}

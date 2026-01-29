@@ -44,7 +44,7 @@ export default function BranchSelector() {
   };
 
   if (loading) {
-    return <div className="text-sm text-gray-500">Loading...</div>;
+    return <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-4">Loading...</div>;
   }
 
   return (
@@ -52,63 +52,68 @@ export default function BranchSelector() {
       <button
         onClick={() => canSwitchBranch && setIsOpen(!isOpen)}
         disabled={!canSwitchBranch}
-        className={`flex items-center gap-2 transition font-medium ${
+        className={`flex items-center gap-2 transition px-4 py-2.5 rounded-2xl border border-[#F0F0F0] bg-[#F9F9F9] hover:bg-white transition-all ${
           canSwitchBranch 
-            ? 'text-gray-700 hover:text-[#8BA888] cursor-pointer' 
-            : 'text-gray-400 cursor-not-allowed'
+            ? 'cursor-pointer' 
+            : 'opacity-50 cursor-not-allowed'
         }`}
       >
-        {hasCartItems ? (
-          <Lock className="w-5 h-5" />
-        ) : (
-          <MapPin className="w-5 h-5" />
-        )}
-        <span>{selectedBranch ? selectedBranch.name : 'Select Branch'}</span>
+        <div className={`w-6 h-6 rounded-lg flex items-center justify-center shadow-sm ${hasCartItems ? 'text-gray-400' : 'text-[#FF6B35]'} bg-white border border-[#F0F0F0]`}>
+          {hasCartItems ? (
+            <Lock className="w-3.5 h-3.5" />
+          ) : (
+            <MapPin className="w-3.5 h-3.5" />
+          )}
+        </div>
+        <div className="text-left hidden lg:block">
+           <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Store Branch</p>
+           <span className="text-[10px] font-black text-[#1A1A1A] uppercase tracking-tight">{selectedBranch ? selectedBranch.name : 'Select Branch'}</span>
+        </div>
         {canSwitchBranch && (
-          <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+          <ChevronDown className={`w-3 h-3 text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
         )}
       </button>
 
       {/* Tooltip when locked */}
       {!canSwitchBranch && (
-        <div className="absolute left-0 top-full mt-2 w-64 bg-gray-800 text-white text-xs px-3 py-2 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-30">
-          <p className="font-semibold mb-1">Branch locked</p>
-          <p>Empty your cart to switch branches. Items from different branches cannot be mixed in one order.</p>
+        <div className="absolute left-0 top-full mt-3 w-64 bg-[#1A1A1A] text-white p-4 rounded-2xl shadow-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none z-30 translate-y-2 group-hover:translate-y-0">
+          <p className="text-[10px] font-black uppercase tracking-widest mb-2 text-[#FF6B35]">Branch locked</p>
+          <p className="text-[10px] font-bold text-gray-400 leading-relaxed uppercase tracking-tight">Empty your cart to switch locations. We deliver fresh from the selected branch only.</p>
         </div>
       )}
 
       {isOpen && canSwitchBranch && (
         <>
-          {/* Backdrop */}
-          <div 
-            className="fixed inset-0 z-10"
-            onClick={() => setIsOpen(false)}
-          />
-          
-          {/* Dropdown Menu */}
-          <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-20">
-            <div className="px-4 py-3 border-b border-gray-100">
-              <p className="text-sm font-semibold text-gray-800">Select Branch</p>
-              <p className="text-xs text-gray-500 mt-1">Choose your preferred branch</p>
+          <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
+          <div className="absolute right-0 mt-3 w-72 bg-white rounded-[32px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-[#F0F0F0] py-4 z-20 animate-in fade-in slide-in-from-top-4 duration-300">
+            <div className="px-6 py-4 border-b border-[#F0F0F0] mb-2">
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Available Outlets</p>
+              <p className="text-sm font-black text-[#1A1A1A] uppercase tracking-tighter">Choose Pickup Point</p>
             </div>
             
-            {branches.map((branch) => (
-              <button
-                key={branch.id}
-                onClick={() => handleBranchSelect(branch)}
-                className={`w-full text-left flex items-center gap-3 px-4 py-3 transition ${
-                  selectedBranch?.id === branch.id
-                    ? 'bg-[#8BA888]/10 text-[#8BA888]'
-                    : 'hover:bg-[#8BA888]/10 text-gray-700'
-                }`}
-              >
-                <MapPin className="w-5 h-5" />
-                <div className="flex-1">
-                  <span className="font-medium block">{branch.name}</span>
-                  <span className="text-xs text-gray-500">{branch.city}</span>
-                </div>
-              </button>
-            ))}
+            <div className="max-h-64 overflow-y-auto px-2">
+              {branches.map((branch) => (
+                <button
+                  key={branch.id}
+                  onClick={() => handleBranchSelect(branch)}
+                  className={`w-full text-left flex items-center gap-4 px-4 py-4 rounded-2xl transition-all ${
+                    selectedBranch?.id === branch.id
+                      ? 'bg-[#FFF9F0] text-[#FF6B35]'
+                      : 'hover:bg-[#F9F9F9] text-gray-700'
+                  }`}
+                >
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-sm border ${
+                    selectedBranch?.id === branch.id ? 'bg-white border-[#FFE082]' : 'bg-white border-[#F0F0F0]'
+                  }`}>
+                    <MapPin className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1">
+                    <span className="text-xs font-black uppercase tracking-tight block">{branch.name}</span>
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{branch.city}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
           </div>
         </>
       )}

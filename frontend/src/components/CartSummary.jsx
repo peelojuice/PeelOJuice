@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { Truck, CheckCircle2, ChevronRight } from 'lucide-react';
 
 export default function CartSummary({ cart, hasAddresses = true }) {
   const navigate = useNavigate();
@@ -13,98 +14,99 @@ export default function CartSummary({ cart, hasAddresses = true }) {
   const grandTotal = Number(cart.grand_total) || 0;
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 sticky top-4">
-      <h2 className="text-2xl font-bold mb-6">Order Summary</h2>
+    <div className="bg-white rounded-[32px] border border-[#F0F0F0] shadow-[0_15px_30px_rgba(0,0,0,0.05)] p-8 sticky top-4">
+      <div className="flex items-center gap-3 mb-8">
+        <div className="w-1 h-6 bg-[#FF6B35] rounded-full"></div>
+        <h2 className="text-xl font-black text-[#1A1A1A] tracking-tighter uppercase">Bill Summary</h2>
+      </div>
       
       {/* Free Delivery Progress */}
       {!cart.free_delivery && foodSubtotal < 99 && (
-        <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-          <div className="flex justify-between text-sm text-blue-700 mb-1">
-            <span className="font-semibold">Add ₹{(99 - foodSubtotal).toFixed(2)} for FREE delivery!</span>
-            <span className="font-bold">🚚</span>
+        <div className="mb-8 p-5 bg-[#FFF9F0] rounded-2xl border border-[#FEEBC8] relative overflow-hidden">
+          <div className="flex justify-between items-center mb-3">
+            <span className="text-[10px] font-black text-[#FF6B35] uppercase tracking-widest flex items-center gap-1.5">
+              <Truck className="w-3.5 h-3.5" />
+              Unlock Free Shipping
+            </span>
+            <span className="text-xs font-black text-[#FF6B35]">₹{(99 - foodSubtotal).toFixed(0)} away</span>
           </div>
-          <div className="w-full bg-blue-200 rounded-full h-2">
+          <div className="w-full bg-white/50 rounded-full h-1.5">
             <div 
-              className="bg-blue-600 h-2 rounded-full transition-all"
+              className="bg-[#FF6B35] h-1.5 rounded-full transition-all duration-1000 shadow-[0_0_8px_rgba(255,107,53,0.5)]"
               style={{ width: `${Math.min((foodSubtotal / 99) * 100, 100)}%` }}
             ></div>
           </div>
         </div>
       )}
       
-      <div className="space-y-3 mb-6">
-        <div className="flex justify-between text-gray-700">
-          <span>Subtotal</span>
-          <span className="font-semibold">₹{foodSubtotal.toFixed(2)}</span>
+      {/* Free delivery badge */}
+      {cart.free_delivery && (
+        <div className="bg-[#F4FFF0] border border-[#D1F0C4] rounded-2xl p-4 flex items-center gap-3 mb-8 shadow-sm">
+          <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center text-green-500 shadow-sm border border-[#D1F0C4]">
+            <CheckCircle2 className="w-5 h-5" />
+          </div>
+          <span className="text-green-700 text-[10px] font-black uppercase tracking-widest leading-none">
+            Free Delivery Unlocked!
+          </span>
+        </div>
+      )}
+
+      <div className="space-y-4 mb-20 text-sm">
+        <div className="flex justify-between items-center">
+          <span className="font-bold text-gray-400 uppercase tracking-widest text-[10px]">Item Total</span>
+          <span className="font-black text-[#1A1A1A]">₹{foodSubtotal.toFixed(0)}</span>
         </div>
         
         {couponDiscount > 0 && (
-          <div className="flex justify-between text-green-600">
-            <span>Coupon Discount</span>
-            <span className="font-semibold">-₹{couponDiscount.toFixed(2)}</span>
+          <div className="flex justify-between items-center text-green-600">
+            <span className="font-bold uppercase tracking-widest text-[10px]">Offer Applied</span>
+            <span className="font-black">-₹{couponDiscount.toFixed(0)}</span>
           </div>
         )}
         
-        <div className="flex justify-between text-gray-700">
-          <span>GST (5%)</span>
-          <span className="font-semibold">₹{foodGST.toFixed(2)}</span>
+        <div className="flex justify-between items-center">
+          <span className="font-bold text-gray-400 uppercase tracking-widest text-[10px]">Handling Fee</span>
+          <span className="font-black text-[#1A1A1A]">₹{(foodGST + platformFee).toFixed(0)}</span>
         </div>
         
-        {/* Delivery Fee with Free Delivery Indicator */}
-        <div className="flex justify-between text-gray-700">
-          <span>Delivery Fee</span>
+        <div className="flex justify-between items-center">
+          <span className="font-bold text-gray-400 uppercase tracking-widest text-[10px]">Delivery Partner Fee</span>
           <div className="flex items-center gap-2">
             {cart.free_delivery ? (
               <>
-                <span className="line-through text-gray-400">₹{cart.original_delivery_fee}</span>
-                <span className="font-semibold text-green-600">FREE</span>
+                <span className="line-through text-gray-300 font-bold">₹{cart.original_delivery_fee}</span>
+                <span className="font-black text-green-600">FREE</span>
               </>
             ) : (
-              <span className="font-semibold">₹{deliveryFee.toFixed(2)}</span>
+              <span className="font-black text-[#1A1A1A]">₹{(deliveryFee + deliveryGST).toFixed(0)}</span>
             )}
           </div>
         </div>
-        
-        {/* Show free delivery badge */}
-        {cart.free_delivery && (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-2 flex items-center gap-2">
-            <span className="text-green-700 text-sm font-semibold">🎉 Free Delivery Applied! (Orders above ₹99)</span>
-          </div>
-        )}
-        
-        <div className="flex justify-between text-gray-700">
-          <span>Delivery GST (18%)</span>
-          <span className="font-semibold">₹{deliveryGST.toFixed(2)}</span>
-        </div>
-        
-        <div className="flex justify-between text-gray-700">
-          <span>Platform Fee</span>
-          <span className="font-semibold">₹{platformFee.toFixed(2)}</span>
-        </div>
-        
-        <div className="border-t pt-3 flex justify-between text-lg font-bold text-gray-900">
-          <span>Total</span>
-          <span className="text-primary">₹{grandTotal.toFixed(2)}</span>
-        </div>
       </div>
-      
-      <div className="relative group">
+
+      <div className="absolute bottom-8 left-8 right-8">
+        <div className="flex justify-between items-end mb-6">
+          <div>
+             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total Payable</p>
+             <p className="text-3xl font-black text-[#1A1A1A] tracking-tighter leading-none">₹{grandTotal.toFixed(0)}</p>
+          </div>
+          {!hasAddresses && (
+            <span className="text-[8px] font-black text-red-400 uppercase tracking-widest mb-1 animate-pulse">Address Required</span>
+          )}
+        </div>
+
         <button
           onClick={() => hasAddresses && navigate('/checkout')}
           disabled={!hasAddresses}
-          className={`w-full py-3 px-6 rounded-lg font-semibold text-lg transition ${
+          className={`group w-full py-5 rounded-[20px] font-black uppercase tracking-[0.2em] text-xs transition-all flex items-center justify-center gap-2 shadow-xl active:scale-95 ${
             hasAddresses
-              ? 'bg-black text-white hover:bg-gray-800'
-              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              ? 'bg-[#1A1A1A] text-white hover:bg-black'
+              : 'bg-gray-100 text-gray-400 cursor-not-allowed border border-[#F0F0F0] shadow-none'
           }`}
         >
-          {hasAddresses ? 'Proceed to Checkout' : 'Add Address to Checkout'}
+          {hasAddresses ? 'Checkout Now' : 'Add Address'}
+          {hasAddresses && <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />}
         </button>
-        {!hasAddresses && (
-          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
-            Please add a delivery address first
-          </div>
-        )}
       </div>
     </div>
   );

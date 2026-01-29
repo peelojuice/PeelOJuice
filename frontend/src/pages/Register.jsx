@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Mail, Lock, User, Phone, Leaf } from 'lucide-react';
+import { Mail, Lock, User, Phone, Star, Zap, ChevronRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export default function Register() {
@@ -25,176 +25,166 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
     if (formData.password !== formData.confirm_password) {
       setError('Passwords do not match');
       return;
     }
-
     setLoading(true);
-
     try {
       const response = await register(formData);
-      
-      if (response.data.phone_otp) {
-        setPhoneOTP(response.data.phone_otp);
-      }
-      
+      if (response.data.phone_otp) setPhoneOTP(response.data.phone_otp);
       navigate('/verify-email', { state: { email: formData.email, phone: formData.phone_number } });
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed. Please try again.');
+      setError(err.response?.data?.message || 'Joining failed. Please check your data.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F2ED] flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md">
-        {/* Branding */}
-        <div className="text-center mb-8">
-          <div className="mb-2">
-            <div className="text-4xl font-bold">
-              <span className="text-[#F5A623]">Peel</span>
-              <span className="text-[#FF6B35]">O</span>
-              <span className="text-[#2D5016]">JUICE</span>
-            </div>
-          </div>
-          <p className="text-sm text-gray-500">Join the Fresh Revolution!</p>
+    <div className="min-h-screen bg-white flex items-center justify-center px-6 py-12">
+      <div className="w-full max-w-[540px]">
+        {/* Logo Section */}
+        <div className="text-center mb-12">
+           <div className="inline-flex items-center gap-4 mb-6 group cursor-pointer" onClick={() => navigate('/')}>
+             <div className="w-16 h-16 bg-[#FF6B35] rounded-3xl flex items-center justify-center shadow-2xl transform transition-transform group-hover:rotate-12">
+                <Star className="w-10 h-10 text-white" fill="currentColor" />
+             </div>
+             <div className="text-left">
+                <h1 className="text-3xl font-black text-[#1A1A1A] tracking-tighter uppercase leading-none">
+                  Peel<span className="text-[#FF6B35]">O</span>Juice
+                </h1>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mt-1">Nature's purest energy</p>
+             </div>
+           </div>
         </div>
 
         {/* Register Card */}
-        <div className="bg-white rounded-2xl shadow-sm p-8">
-          <h2 className="text-2xl font-semibold text-gray-800 text-center mb-6">
-            Create Account
-          </h2>
+        <div className="bg-white rounded-[40px] border border-[#F0F0F0] p-12 shadow-[0_30px_70px_rgba(0,0,0,0.05)]">
+          <div className="mb-10 text-center">
+            <h2 className="text-2xl font-black text-[#1A1A1A] tracking-tighter uppercase mb-2">Create Identity</h2>
+            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Join the fresh revolution today</p>
+          </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm text-center">
+            <div className="bg-[#FFF5F8] border border-[#FED7E2] text-red-500 px-6 py-4 rounded-2xl mb-8 text-[10px] font-black uppercase tracking-widest text-center animate-in fade-in slide-in-from-top-2">
               {error}
             </div>
           )}
 
           {phoneOTP && (
-            <div className="bg-amber-50 border border-amber-300 px-4 py-3 rounded-lg mb-4">
-              <div className="text-amber-800 font-semibold text-sm mb-1">🔧 Dev Mode</div>
-              <div className="text-amber-900">
-                Phone OTP: <span className="font-mono font-bold text-lg">{phoneOTP}</span>
+            <div className="bg-[#FFF9F0] border border-[#FEEBC8] p-6 rounded-[24px] mb-8 flex items-center justify-between">
+              <div>
+                <p className="text-[8px] font-black text-[#FF6B35] uppercase tracking-widest mb-1">Dev Environment OTP</p>
+                <p className="text-2xl font-black text-[#1A1A1A] tracking-tighter">{phoneOTP}</p>
               </div>
+              <Zap className="w-8 h-8 text-[#FF6B35] opacity-20" />
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Name Row */}
-            <div className="grid grid-cols-2 gap-3">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm text-gray-600 mb-2">First Name</label>
+                <label className="block text-[8px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3 ml-1">First Name</label>
                 <input
                   type="text"
                   name="first_name"
                   placeholder="John"
                   value={formData.first_name}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-[#8BA888] focus:ring-1 focus:ring-[#8BA888] transition text-gray-700 text-sm"
+                  className="w-full px-8 py-5 bg-[#F9F9F9] border-2 border-[#F0F0F0] rounded-[24px] text-sm font-black text-[#1A1A1A] focus:bg-white focus:border-[#FF6B35] focus:outline-none transition-all placeholder:text-gray-300 placeholder:font-bold"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm text-gray-600 mb-2">Last Name</label>
+                <label className="block text-[8px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3 ml-1">Last Name</label>
                 <input
                   type="text"
                   name="last_name"
                   placeholder="Doe"
                   value={formData.last_name}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-[#8BA888] focus:ring-1 focus:ring-[#8BA888] transition text-gray-700 text-sm"
+                  className="w-full px-8 py-5 bg-[#F9F9F9] border-2 border-[#F0F0F0] rounded-[24px] text-sm font-black text-[#1A1A1A] focus:bg-white focus:border-[#FF6B35] focus:outline-none transition-all placeholder:text-gray-300 placeholder:font-bold"
                   required
                 />
               </div>
             </div>
 
-            {/* Email */}
             <div>
-              <label className="block text-sm text-gray-600 mb-2">Email</label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <label className="block text-[8px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3 ml-1">Email Connection</label>
+              <div className="relative group">
+                <Mail className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300 group-focus-within:text-[#FF6B35] transition-colors" />
                 <input
                   type="email"
                   name="email"
-                  placeholder="your@email.com"
+                  placeholder="name@energy.com"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-[#8BA888] focus:ring-1 focus:ring-[#8BA888] transition text-gray-700"
+                  className="w-full pl-16 pr-6 py-5 bg-[#F9F9F9] border-2 border-[#F0F0F0] rounded-[24px] text-sm font-black text-[#1A1A1A] focus:bg-white focus:border-[#FF6B35] focus:outline-none transition-all placeholder:text-gray-300 placeholder:font-bold"
                   required
                 />
               </div>
             </div>
 
-            {/* Phone */}
             <div>
-              <label className="block text-sm text-gray-600 mb-2">Phone Number</label>
-              <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <label className="block text-[8px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3 ml-1">Contact Number</label>
+              <div className="relative group">
+                <Phone className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300 group-focus-within:text-[#FF6B35] transition-colors" />
                 <input
                   type="tel"
                   name="phone_number"
-                  placeholder="+91 1234567890"
+                  placeholder="+91 ••••• •••••"
                   value={formData.phone_number}
                   onChange={handleChange}
-                  className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-[#8BA888] focus:ring-1 focus:ring-[#8BA888] transition text-gray-700"
+                  className="w-full pl-16 pr-6 py-5 bg-[#F9F9F9] border-2 border-[#F0F0F0] rounded-[24px] text-sm font-black text-[#1A1A1A] focus:bg-white focus:border-[#FF6B35] focus:outline-none transition-all placeholder:text-gray-300 placeholder:font-bold"
                   required
                 />
               </div>
             </div>
 
-            {/* Password */}
-            <div>
-              <label className="block text-sm text-gray-600 mb-2">Password</label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-[8px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3 ml-1">Password</label>
                 <input
                   type="password"
                   name="password"
                   placeholder="••••••••"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-[#8BA888] focus:ring-1 focus:ring-[#8BA888] transition text-gray-700"
+                  className="w-full px-8 py-5 bg-[#F9F9F9] border-2 border-[#F0F0F0] rounded-[24px] text-sm font-black text-[#1A1A1A] focus:bg-white focus:border-[#FF6B35] focus:outline-none transition-all placeholder:text-gray-300 placeholder:font-bold"
                   required
                 />
               </div>
-            </div>
-
-            {/* Confirm Password */}
-            <div>
-              <label className="block text-sm text-gray-600 mb-2">Confirm Password</label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <div>
+                <label className="block text-[8px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3 ml-1">Confirm</label>
                 <input
                   type="password"
                   name="confirm_password"
                   placeholder="••••••••"
                   value={formData.confirm_password}
                   onChange={handleChange}
-                  className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-[#8BA888] focus:ring-1 focus:ring-[#8BA888] transition text-gray-700"
+                  className="w-full px-8 py-5 bg-[#F9F9F9] border-2 border-[#F0F0F0] rounded-[24px] text-sm font-black text-[#1A1A1A] focus:bg-white focus:border-[#FF6B35] focus:outline-none transition-all placeholder:text-gray-300 placeholder:font-bold"
                   required
                 />
               </div>
             </div>
 
-            {/* Register Button */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#8BA888] text-white font-medium py-3 rounded-lg hover:bg-[#7a9677] transition disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+              className="w-full bg-[#1A1A1A] text-white py-6 rounded-[24px] font-black uppercase tracking-[0.2em] text-[10px] hover:bg-black transition-all shadow-xl active:scale-95 disabled:opacity-50 disabled:scale-100 flex items-center justify-center gap-3"
             >
-              {loading ? 'Creating Account...' : 'Sign Up'}
+              {loading ? (
+                <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+              ) : (
+                <>Join Revolution <ChevronRight className="w-4 h-4 text-[#FF6B35]" /></>
+              )}
             </button>
 
-            {/* Login Link */}
-            <div className="text-center text-sm text-gray-600">
-              Already have an account?{' '}
-              <Link to="/login" className="text-gray-800 font-semibold underline hover:text-[#8BA888]">
-                Sign in
+            <div className="text-center pt-4">
+              <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Returning warrior?</span>
+              <Link to="/login" className="ml-2 text-[10px] font-black text-[#FF6B35] uppercase tracking-widest hover:underline">
+                Sign In
               </Link>
             </div>
           </form>

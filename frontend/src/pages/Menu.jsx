@@ -1,10 +1,12 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api, { BASE_URL } from '../services/api';
+import { Search, X, Star } from 'lucide-react';
+import api from '../services/api';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
 import { useBranch } from '../context/BranchContext';
 import CategoryFilter from '../components/CategoryFilter';
+import JuiceCard from '../components/JuiceCard';
 
 export default function Menu() {
   const navigate = useNavigate();
@@ -14,6 +16,7 @@ export default function Menu() {
   const [juices, setJuices] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -22,7 +25,6 @@ export default function Menu() {
 
   useEffect(() => {
     fetchCategories();
-    // Fetch juices on initial load
     fetchJuices(1, true);
   }, []);
 
@@ -31,7 +33,7 @@ export default function Menu() {
     setPage(1);
     setHasMore(true);
     fetchJuices(1, true);
-  }, [selectedCategory, selectedBranch]); // Added selectedBranch to dependencies
+  }, [selectedCategory, selectedBranch]);
 
   const fetchCategories = async () => {
     try {
@@ -42,8 +44,7 @@ export default function Menu() {
     }
   };
 
-
-  const fetchJuices = async (pageNum, reset = false) =>{
+  const fetchJuices = async (pageNum, reset = false) => {
     if (!hasMore && !reset) return;
     
     setLoadingMore(true);
@@ -54,8 +55,6 @@ export default function Menu() {
       }
       
       let response;
-      // If branch is selected, use branch-specific endpoint
-      // Otherwise, fallback to general juices endpoint
       if (selectedBranch) {
         response = await api.get(`/products/branches/${selectedBranch.id}/products/`, { params });
       } else {
@@ -98,30 +97,6 @@ export default function Menu() {
     if (node) observer.current.observe(node);
   }, [loadingMore, hasMore]);
 
-  // Scroll-based zoom animation
-  useEffect(() => {
-    const scrollObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('scale-100', 'opacity-100');
-            entry.target.classList.remove('scale-90', 'opacity-0');
-          }
-        });
-      },
-      {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-      }
-    );
-
-    // Observe all product cards
-    const cards = document.querySelectorAll('.product-card');
-    cards.forEach((card) => scrollObserver.observe(card));
-
-    return () => scrollObserver.disconnect();
-  }, [juices]);
-
   const handleAddToCart = async (juice) => {
     const accessToken = sessionStorage.getItem('accessToken');
     if (!accessToken) {
@@ -132,106 +107,124 @@ export default function Menu() {
 
     const result = await addToCart(juice.id, 1);
     if (result.success) {
-      showToast('Added to cart!', 'success');
+      showToast(`${juice.name} added!`, 'success');
     } else {
       showToast('Failed to add to cart', 'error');
     }
   };
 
+  // Filter juices by search query for current page
+  const filteredJuices = useMemo(() => {
+    if (!searchQuery) return juices;
+    return juices.filter(juice => 
+      juice.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      juice.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      juice.category?.name?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [juices, searchQuery]);
+
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-[#F5F2ED]">
-        <div className="text-lg font-medium text-gray-700">Loading menu...</div>
+      <div className="flex justify-center items-center min-h-screen bg-white">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-[#FF6B35] border-t-transparent rounded-full animate-spin"></div>
+          <div className="text-lg font-extrabold text-[#1A1A1A] tracking-tight">Refreshing Menu...</div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white px-4 py-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-semibold text-gray-800 mb-2">
-            Our Menu
-          </h1>
-          <p className="text-gray-600">
-            Fresh pressed wellness delivered with care
-          </p>
+    <div className="min-h-screen bg-white pb-24">
+      {/* Header Section */}
+      <div className="bg-white pt-10 pb-4">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+            <div className="flex items-center gap-3">
+              <div className="bg-[#FFF9F0] p-2 rounded-2xl">
+                <Star className="w-8 h-8 text-[#FF6B35]" fill="#FF6B35" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-black text-[#1A1A1A] tracking-tighter uppercase">
+                  Our Menu
+                </h1>
+                <p className="text-gray-400 font-bold text-xs uppercase tracking-widest mt-0.5">
+                  Freshness in every sip
+                </p>
+              </div>
+            </div>
+
+            {/* Premium Search Bar */}
+            <div className="relative group flex-1 max-w-md">
+              <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                <Search className="h-5 w-5 text-gray-400 group-focus-within:text-[#FF6B35] transition-colors" />
+              </div>
+              <input
+                type="text"
+                className="block w-full pl-12 pr-12 py-4 bg-[#F9F9F9] border border-[#F0F0F0] rounded-[24px] text-gray-800 font-bold text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B35]/20 focus:border-[#FF6B35] transition-all placeholder:text-gray-400 placeholder:font-medium"
+                placeholder="Search juices, categories..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              {searchQuery && (
+                <button 
+                  onClick={() => setSearchQuery('')}
+                  className="absolute inset-y-0 right-0 pr-5 flex items-center text-gray-400 hover:text-gray-600"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Category Filter */}
+          <CategoryFilter 
+            categories={categories}
+            selectedCategory={selectedCategory}
+            onSelectCategory={setSelectedCategory}
+          />
         </div>
+      </div>
 
-        {/* Category Filter */}
-        <CategoryFilter 
-          categories={categories}
-          selectedCategory={selectedCategory}
-          onSelectCategory={setSelectedCategory}
-        />
-
-        {/* Products Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
-          {juices.map((juice, index) => {
-            const isLast = juices.length === index + 1;
-            return (
-              <div 
-                key={juice.id} 
-                ref={isLast ? lastJuiceElementRef : null}
-                onClick={() => navigate(`/juice/${juice.id}`)}
-                className="product-card bg-white rounded-2xl shadow-sm overflow-hidden hover:-translate-y-2 hover:shadow-lg transition-all duration-500 cursor-pointer scale-90 opacity-0"
-              >
-                {/* Product Image - Static, no zoom */}
-                <div className="aspect-[4/3] bg-gray-100 overflow-hidden">
-                  <img
-                    src={juice.image ? (juice.image.startsWith('http') ? juice.image : `${BASE_URL}${juice.image}`) : '/carrot-juice.png'}
-                    alt={juice.name}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.target.src = '/carrot-juice.png';
-                    }}
+      {/* Products Grid */}
+      <div className="max-w-7xl mx-auto px-6">
+        {filteredJuices.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {filteredJuices.map((juice, index) => {
+              const isLast = filteredJuices.length === index + 1;
+              return (
+                <div 
+                  key={juice.id} 
+                  ref={isLast ? lastJuiceElementRef : null}
+                  className="animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both"
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  <JuiceCard 
+                    juice={juice} 
+                    onAddToCart={handleAddToCart} 
                   />
                 </div>
-
-                {/* Product Info */}
-                <div className="p-5">
-                  <div className="text-xs text-gray-500 mb-1">{juice.category?.name || 'Juice'}</div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-2">{juice.name}</h3>
-                  <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-                    {juice.description || 'Fresh and delicious juice made with premium ingredients.'}
-                  </p>
-
-                  {/* Price and Add Button */}
-                  <div className="flex items-center justify-between">
-                    <div className="text-xl font-semibold text-gray-800">
-                      ₹{juice.price}
-                    </div>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleAddToCart(juice);
-                      }}
-                      className="px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition font-medium text-sm flex items-center gap-2"
-                    >
-                      <span>+</span>
-                      <span>Add</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Loading More */}
-        {loadingMore && (
-          <div className="text-center py-8">
-            <div className="text-gray-600">Loading more...</div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="text-center py-32 flex flex-col items-center">
+            <div className="w-24 h-24 bg-[#F9F9F9] rounded-full flex items-center justify-center mb-6 border border-[#F0F0F0]">
+              <Search className="w-10 h-10 text-[#FF6B35] opacity-20" />
+            </div>
+            <h3 className="text-2xl font-black text-[#1A1A1A] tracking-tighter uppercase mb-2">
+              No juices found
+            </h3>
+            <p className="text-gray-400 font-bold text-sm uppercase tracking-widest">
+              Try a different search or category
+            </p>
           </div>
         )}
 
-        {/* No Results */}
-        {!loading && juices.length === 0 && (
-          <div className="text-center py-20">
-            <div className="text-6xl mb-4">🥤</div>
-            <h3 className="text-2xl font-semibold text-gray-800 mb-2">No juices found</h3>
-            <p className="text-gray-600">Try selecting a different category</p>
+        {/* Loading More Spinner */}
+        {loadingMore && (
+          <div className="flex justify-center mt-16 pb-10">
+            <div className="w-8 h-8 border-3 border-[#FF6B35] border-t-transparent rounded-full animate-spin"></div>
           </div>
         )}
       </div>
